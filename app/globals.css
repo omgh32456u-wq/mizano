@@ -1,0 +1,140 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--font-plex-arabic), ui-sans-serif, system-ui, sans-serif;
+  --color-protein: var(--protein);
+  --color-carbs: var(--carbs);
+  --color-fat: var(--fat);
+  --color-energy: var(--energy);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  color-scheme: light;
+  --background: oklch(0.982 0.006 95);
+  --foreground: oklch(0.22 0.02 155);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.02 155);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.02 155);
+  --primary: oklch(0.46 0.1 158);
+  --primary-foreground: oklch(0.985 0.01 95);
+  --secondary: oklch(0.95 0.012 120);
+  --secondary-foreground: oklch(0.26 0.03 155);
+  --muted: oklch(0.955 0.008 95);
+  --muted-foreground: oklch(0.47 0.02 155);
+  --accent: oklch(0.94 0.03 158);
+  --accent-foreground: oklch(0.3 0.06 158);
+  --destructive: oklch(0.56 0.2 27);
+  --border: oklch(0.905 0.01 95);
+  --input: oklch(0.88 0.012 95);
+  --ring: oklch(0.46 0.1 158);
+  --energy: oklch(0.46 0.1 158);
+  --protein: oklch(0.52 0.11 235);
+  --carbs: oklch(0.7 0.14 72);
+  --fat: oklch(0.6 0.15 32);
+  --warning: oklch(0.96 0.05 85);
+  --warning-foreground: oklch(0.42 0.09 65);
+  --chart-1: var(--energy);
+  --chart-2: var(--protein);
+  --chart-3: var(--carbs);
+  --chart-4: var(--fat);
+  --chart-5: oklch(0.6 0.02 155);
+  --radius: 0.75rem;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: oklch(0.165 0.012 160);
+  --foreground: oklch(0.95 0.008 95);
+  --card: oklch(0.205 0.014 160);
+  --card-foreground: oklch(0.95 0.008 95);
+  --popover: oklch(0.225 0.015 160);
+  --popover-foreground: oklch(0.95 0.008 95);
+  --primary: oklch(0.76 0.13 158);
+  --primary-foreground: oklch(0.18 0.03 160);
+  --secondary: oklch(0.26 0.015 160);
+  --secondary-foreground: oklch(0.93 0.01 95);
+  --muted: oklch(0.25 0.012 160);
+  --muted-foreground: oklch(0.72 0.015 120);
+  --accent: oklch(0.3 0.04 158);
+  --accent-foreground: oklch(0.92 0.04 158);
+  --destructive: oklch(0.68 0.18 25);
+  --border: oklch(1 0 0 / 9%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.76 0.13 158);
+  --energy: oklch(0.76 0.13 158);
+  --protein: oklch(0.74 0.1 235);
+  --carbs: oklch(0.82 0.13 80);
+  --fat: oklch(0.73 0.13 35);
+  --warning: oklch(0.3 0.05 75);
+  --warning-foreground: oklch(0.88 0.09 85);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: 'tnum' 0;
+  }
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
