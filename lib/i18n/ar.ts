@@ -301,7 +301,7 @@ export const ar: Record<MessageKey, string> = {
   'targets.optional': 'اختياري',
   'targets.enable': 'عرض الأهداف اليومية',
   'targets.kcal': 'هدف الطاقة (سعرة)',
-  'targets.split': 'توزيع العناصر الغذائية (% من الطاقة)',
+  'targets.split': 'توزيع ا��عناصر الغذائية (% من الطاقة)',
   'targets.sum': 'الإجمالي: {n}%',
   'targets.grams': '≈ {g} جم',
   'targets.estimate': 'استخدام تقديري',
@@ -374,6 +374,20 @@ export const ar: Record<MessageKey, string> = {
   'wheel.kind.food': 'فكرة طعام',
   'wheel.kind.recipe': 'وصفة',
   'wheel.kind.activity': 'نشاط',
+
+  'reminders.title': 'التذكيرات',
+  'reminders.hint': 'تنبيهات اختيارية لتسجيل وجباتك. متوقفة افتراضيًا.',
+  'reminders.enable': 'تذكيرات الوجبات',
+  'reminders.time': 'وقت تذكير {meal}',
+  'reminders.test': 'إرسال تذكير تجريبي',
+  'reminders.testBody': 'التذكيرات تعمل.',
+  'reminders.testFailed': 'منع المتصفح هذا الإشعار.',
+  'reminders.notifyTitle': 'ميزانو',
+  'reminders.notifyBody': 'تذكير لطيف لتسجيل {meal} عندما تكون مستعدًا.',
+  'reminders.unsupported': 'هذا المتصفح لا يدعم الإشعارات. على iPhone، أضف ميزانو إلى الشاشة الرئيسية أولًا (iOS 16.4 أو أحدث).',
+  'reminders.denied': 'الإشعارات محظورة لهذا الموقع. اسمح بها من إعدادات الموقع في المتصفح ثم عد إلى هنا.',
+  'reminders.limits':
+    'تعمل التذكيرات فقط عندما يكون ميزانو مفتوحًا أو يعمل في علامة تبويب بالخلفية. لا تسمح المتصفحات لتطبيقات الويب بجدولة تنبيهات وهي مغلقة، لذا يظهر التذكير عند فتح التطبيق خلال ساعة من موعده. تُحفظ على هذا الجهاز فقط.',
 
   'toast.region': 'الإشعارات',
 }

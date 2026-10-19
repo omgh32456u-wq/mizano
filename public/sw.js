@@ -26,6 +26,16 @@ self.addEventListener('activate', (event) => {
 const isStaticAsset = (url) =>
   url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/icons/') || /\.(?:png|svg|jpg|jpeg|webp|ico|woff2?)$/.test(url.pathname)
 
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      const client = list.find((c) => 'focus' in c)
+      return client ? client.focus() : self.clients.openWindow('/')
+    }),
+  )
+})
+
 self.addEventListener('fetch', (event) => {
   const { request } = event
   if (request.method !== 'GET') return

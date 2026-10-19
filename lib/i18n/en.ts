@@ -362,6 +362,20 @@ export const en = {
 
   'toast.region': 'Notifications',
 
+  'reminders.title': 'Reminders',
+  'reminders.hint': 'Optional nudges to log your meals. Off by default.',
+  'reminders.enable': 'Meal reminders',
+  'reminders.time': 'Reminder time for {meal}',
+  'reminders.test': 'Send a test reminder',
+  'reminders.testBody': 'Reminders are working.',
+  'reminders.testFailed': 'This browser blocked the notification.',
+  'reminders.notifyTitle': 'Mizano',
+  'reminders.notifyBody': 'A gentle reminder to log {meal} when you’re ready.',
+  'reminders.unsupported': 'This browser doesn’t support notifications. On iPhone, add Mizano to your Home Screen first (iOS 16.4 or later).',
+  'reminders.denied': 'Notifications are blocked for this site. Allow them in your browser’s site settings, then come back here.',
+  'reminders.limits':
+    'Reminders only work while Mizano is open or running in a background tab. Browsers don’t let web apps schedule alarms when closed, so a reminder is shown when you next open the app within an hour of its time. They are saved on this device only.',
+
   'wheel.title': 'Idea wheel',
   'wheel.hint': 'A random food idea, recipe or activity.',
   'wheel.open': 'Spin',

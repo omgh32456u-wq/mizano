@@ -10,6 +10,7 @@ import { useAction } from '@/components/providers/use-action'
 import { MEAL_SLOTS, type MealSlot, type Profile } from '@/lib/types'
 import { DataCard } from './data-card'
 import { ProfileForm } from './profile-form'
+import { RemindersCard } from './reminders-card'
 
 // Exact attribution requested by the owner; name and phone are identical in both locales and always LTR.
 const CREDITS_NAME = 'Omar Elhady'
@@ -27,6 +28,7 @@ export function SettingsScreen() {
           <PreferencesCard />
           <ProfileCard />
           <MealNamesCard />
+          <RemindersCard />
         </div>
         <div className="flex flex-col gap-5">
           <TargetsCard />

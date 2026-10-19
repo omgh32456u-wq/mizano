@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { mergeData } from '@/lib/backup'
 import { todayKey } from '@/lib/dates'
 import { createId, defaultSettings, normalizeSettings, PREFS_STORAGE_KEY } from '@/lib/defaults'
+import { REMINDERS_STORAGE_KEY } from '@/lib/reminders'
 import { buildSeedFoods, SEED_VERSION } from '@/lib/foods-seed'
 import { createTranslator, type Translator } from '@/lib/i18n'
 import { openDatabase, type Database } from '@/lib/storage/db'
@@ -340,6 +341,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     await db().clearAll()
     try {
       localStorage.removeItem(PREFS_STORAGE_KEY)
+      localStorage.removeItem(REMINDERS_STORAGE_KEY)
     } catch {
       /* ignore */
     }
