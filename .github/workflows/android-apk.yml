@@ -5,13 +5,19 @@ on:
   push:
     tags:
       - 'v*'
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
 
 concurrency:
-  group: android-apk-${{ github.ref }}
+  group: android-apk-${{ github.event_name }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
+
+env:
+  APP_ID: com.omgh32456uwq.mizano
 
 jobs:
   build-apk:
@@ -19,8 +25,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
+      # Pull requests build the PR head (not the merge ref) so the lockfile/Android project committed back matches it.
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
 
       # Version comes from "packageManager" in package.json.
       - name: Set up pnpm
@@ -40,6 +49,8 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools platforms;android-36 build-tools;36.0.0
 
       - name: Set up Gradle (caches ~/.gradle)
         uses: gradle/actions/setup-gradle@v4
@@ -53,22 +64,39 @@ jobs:
           path: ~/.android/debug.keystore
           key: android-debug-keystore-v1
 
+      # Frozen first so a committed, consistent lockfile is honoured exactly; if package.json and the lockfile
+      # disagree (e.g. dependencies were added without a registry), resolve fresh and commit the result below.
       - name: Install dependencies
         run: |
           if ! pnpm install --frozen-lockfile; then
-            echo "::warning::pnpm-lock.yaml is out of sync with package.json; resolving it fresh (it is committed back below)"
+            echo "::warning::pnpm-lock.yaml is out of sync with package.json; resolving it fresh (committed back after a green build)"
             pnpm install --no-frozen-lockfile
           fi
 
-      # Build first: `next build` writes next-env.d.ts and .next/types, which tsc needs.
+      - name: Check Capacitor packages resolved to a single major
+        run: |
+          pnpm ls @capacitor/core @capacitor/cli @capacitor/android @capacitor/filesystem @capacitor/share --depth 0
+          for pkg in core cli android filesystem share; do
+            v=$(node -p "require('./node_modules/@capacitor/$pkg/package.json').version")
+            echo "@capacitor/$pkg $v"
+            case "$v" in 8.*) ;; *) echo "::error::@capacitor/$pkg resolved to $v, expected 8.x"; exit 1 ;; esac
+          done
+
+      # Build before typecheck: `next build` writes next-env.d.ts and .next/types, which tsc needs.
       - name: Build static web app (out/)
         run: pnpm build
 
-      - name: Verify static routes
+      - name: Verify static routes and manifest
         run: |
           for page in index.html foods/index.html progress/index.html settings/index.html manifest.webmanifest sw.js; do
-            test -f "out/$page" || { echo "::error::out/$page is missing from the static export"; exit 1; }
+            test -s "out/$page" || { echo "::error::out/$page is missing or empty in the static export"; exit 1; }
           done
+          node -e "
+            const m = JSON.parse(require('fs').readFileSync('out/manifest.webmanifest', 'utf8'));
+            if (m.name !== 'Mizano') throw new Error('manifest name is ' + m.name);
+            for (const i of m.icons) if (!require('fs').existsSync('out' + i.src)) throw new Error('manifest icon missing: ' + i.src);
+            console.log('manifest ok:', m.name, m.icons.length + ' icons');
+          "
 
       - name: Type check
         run: pnpm typecheck
@@ -76,10 +104,12 @@ jobs:
       - name: Test
         run: pnpm test
 
-      - name: Add Android platform (first run only)
+      - name: Add Android platform (only when android/ does not exist)
         run: |
           if [ ! -d android ]; then
             pnpm exec cap add android
+          else
+            echo "android/ already exists, skipping cap add"
           fi
 
       - name: Apply Mizano launcher icons
@@ -90,6 +120,15 @@ jobs:
       - name: Sync Capacitor
         run: pnpm exec cap sync android
 
+      - name: Verify Android project and package id
+        run: |
+          for f in android/gradlew android/build.gradle android/settings.gradle android/app/build.gradle android/app/src/main/AndroidManifest.xml android/gradle/wrapper/gradle-wrapper.properties; do
+            test -s "$f" || { echo "::error::$f was not generated"; exit 1; }
+          done
+          grep -q "$APP_ID" android/app/build.gradle || { echo "::error::$APP_ID not found in android/app/build.gradle"; exit 1; }
+          grep -q "\"$APP_ID\"" android/app/src/main/assets/capacitor.config.json || { echo "::error::synced capacitor.config.json has the wrong appId"; exit 1; }
+          test -s android/app/src/main/assets/public/index.html || { echo "::error::web assets were not synced into the Android project"; exit 1; }
+
       - name: Build debug APK
         working-directory: android
         run: |
@@ -99,9 +138,12 @@ jobs:
       - name: Verify and name the APK
         id: apk
         run: |
-          src=$(ls android/app/build/outputs/apk/debug/*.apk | head -n 1)
+          src=$(ls android/app/build/outputs/apk/debug/*.apk 2>/dev/null | head -n 1)
+          test -n "$src" || { echo "::error::Gradle finished but produced no APK"; exit 1; }
+          test -s "$src" || { echo "::error::$src is empty"; exit 1; }
           unzip -l "$src" | grep -q 'assets/public/index.html' || { echo "::error::APK does not contain the web app"; exit 1; }
-          unzip -p "$src" assets/capacitor.config.json | grep -q 'com.omgh32456uwq.mizano' || { echo "::error::APK has the wrong app id"; exit 1; }
+          aapt2=$(ls -d "$ANDROID_HOME"/build-tools/*/aapt2 | sort -V | tail -n 1)
+          "$aapt2" dump badging "$src" | grep -q "package: name='$APP_ID'" || { echo "::error::APK package id is not $APP_ID"; exit 1; }
           if [ "$GITHUB_REF_TYPE" = "tag" ]; then
             name="mizano-${GITHUB_REF_NAME}-debug.apk"
           else
@@ -109,6 +151,7 @@ jobs:
           fi
           mkdir -p dist
           cp "$src" "dist/$name"
+          test -s "dist/$name"
           echo "name=$name" >> "$GITHUB_OUTPUT"
           echo "### $name ($(du -h "dist/$name" | cut -f1))" >> "$GITHUB_STEP_SUMMARY"
 
@@ -120,11 +163,15 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
-      # Keeps the repo complete: the generated android/ project and the resolved lockfile land on the branch
-      # that was dispatched. Best effort, so a protected branch only costs a warning, never the APK.
+      # Only after a fully green build: commit the generated android/ project and the resolved lockfile back to
+      # the branch being built. Skipped for tags and fork PRs. Best effort: a protected branch costs a warning, not the APK.
       - name: Commit generated Android project and lockfile
-        if: github.event_name == 'workflow_dispatch' && github.ref_type == 'branch'
+        if: >-
+          (github.event_name == 'workflow_dispatch' && github.ref_type == 'branch') ||
+          (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
         continue-on-error: true
+        env:
+          BRANCH: ${{ github.head_ref || github.ref_name }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -134,7 +181,7 @@ jobs:
             exit 0
           fi
           git commit -m "chore(android): commit generated Android project and resolved lockfile"
-          git push
+          git push origin "HEAD:refs/heads/$BRANCH"
 
   release:
     name: Attach APK to GitHub Release
@@ -149,6 +196,11 @@ jobs:
         with:
           name: mizano-debug-apk
           path: dist
+
+      - name: Verify APK before release
+        run: |
+          ls -l dist
+          for f in dist/*.apk; do test -s "$f" || { echo "::error::$f is empty"; exit 1; }; done
 
       - name: Create release
         uses: softprops/action-gh-release@v2
