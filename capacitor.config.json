@@ -1,0 +1,8 @@
+{
+  "appId": "com.omgh32456uwq.mizano",
+  "appName": "Mizano",
+  "webDir": "out",
+  "server": {
+    "androidScheme": "https"
+  }
+}

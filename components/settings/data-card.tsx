@@ -29,14 +29,16 @@ export function DataCard() {
 
   const stamp = () => store.today
 
-  const exportJson = () => {
-    downloadFile(`mizano-backup-${stamp()}.json`, JSON.stringify(createBackup(store.snapshot()), null, 2), 'application/json')
-    toast({ message: t('data.exported') })
+  const save = async (filename: string, content: string, mime: string) => {
+    try {
+      await downloadFile(filename, content, mime)
+      toast({ message: t('data.exported') })
+    } catch {
+      toast({ message: t('common.error'), tone: 'error' })
+    }
   }
-  const exportCsv = () => {
-    downloadFile(`mizano-log-${stamp()}.csv`, logsToCsv(store.logs), 'text/csv;charset=utf-8')
-    toast({ message: t('data.exported') })
-  }
+  const exportJson = () => save(`mizano-backup-${stamp()}.json`, JSON.stringify(createBackup(store.snapshot()), null, 2), 'application/json')
+  const exportCsv = () => save(`mizano-log-${stamp()}.csv`, logsToCsv(store.logs), 'text/csv;charset=utf-8')
 
   const onFile = async (file: File | undefined) => {
     if (!file) return

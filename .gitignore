@@ -13,4 +13,6 @@ __v0_jsx-dev-runtime.ts
 # Common ignores
 node_modules
 .next/
+# Static export output (Capacitor webDir)
+out/
 .DS_Store

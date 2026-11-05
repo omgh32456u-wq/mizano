@@ -1,28 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Fully static export: the app is client-only (IndexedDB), so the same `out/` folder serves the web
+  // deployment and the Capacitor Android shell (webDir: out).
+  output: 'export',
+  // Emits /foods/index.html instead of /foods.html, which is what Android's asset server resolves.
+  trailingSlash: true,
   images: {
     unoptimized: true,
   },
-  async headers() {
-    return [
-      {
-        source: '/:path*',
-        headers: [
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'Strict-Transport-Security', value: 'max-age=63072000' },
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-        ],
-      },
-      {
-        source: '/sw.js',
-        headers: [
-          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
-          { key: 'Service-Worker-Allowed', value: '/' },
-        ],
-      },
-    ]
-  },
+  // Security/cache headers used to live in headers(), which static export does not support.
+  // They are now in vercel.json (same values).
 }
 
 export default nextConfig

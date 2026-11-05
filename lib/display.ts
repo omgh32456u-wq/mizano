@@ -1,3 +1,4 @@
+import { isNativeApp, shareTextFile } from './native'
 import type { Food, Locale, LoggedItem, ServingUnit } from './types'
 
 export function localName(item: Pick<Food | LoggedItem, 'nameEn' | 'nameAr'>, locale: Locale): string {
@@ -45,7 +46,8 @@ export function searchFoods(foods: Food[], query: string): Food[] {
   return scored.sort((a, b) => a.score - b.score).map((s) => s.food)
 }
 
-export function downloadFile(filename: string, content: string, mime: string) {
+export async function downloadFile(filename: string, content: string, mime: string) {
+  if (isNativeApp()) return shareTextFile(filename, content)
   const blob = new Blob([content], { type: mime })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
