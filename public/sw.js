@@ -1,8 +1,9 @@
 /* Mizano service worker: offline app shell, no user data is cached here (data lives in IndexedDB). */
-const VERSION = 'tmm-v1'
+// v2: static export uses trailing-slash routes (/foods/); bumping the version drops the old v1 caches on activate.
+const VERSION = 'tmm-v2'
 const SHELL_CACHE = `${VERSION}-shell`
 const ASSET_CACHE = `${VERSION}-assets`
-const SHELL_ROUTES = ['/', '/foods', '/progress', '/settings']
+const SHELL_ROUTES = ['/', '/foods/', '/progress/', '/settings/']
 const PRECACHE = [...SHELL_ROUTES, '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icon.svg']
 
 self.addEventListener('install', (event) => {
