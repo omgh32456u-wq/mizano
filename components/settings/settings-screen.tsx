@@ -9,6 +9,7 @@ import { useStore } from '@/components/providers/app-store'
 import { useAction } from '@/components/providers/use-action'
 import { MEAL_SLOTS, type MealSlot, type Profile } from '@/lib/types'
 import { DataCard } from './data-card'
+import { DayStartField } from './day-start-field'
 import { ProfileForm } from './profile-form'
 import { RemindersCard } from './reminders-card'
 
@@ -26,6 +27,7 @@ export function SettingsScreen() {
       <div className="grid gap-5 lg:grid-cols-2 lg:items-start">
         <div className="flex flex-col gap-5">
           <PreferencesCard />
+          <DayStartCard />
           <ProfileCard />
           <MealNamesCard />
           <RemindersCard />
@@ -90,6 +92,40 @@ function PreferencesCard() {
         />
       </div>
     </SettingsSection>
+  )
+}
+
+function DayStartCard() {
+  const store = useStore()
+  const { t } = store.i18n
+  return (
+    <SettingsSection id="day-start" title={t('dayStart.title')}>
+      {/* Re-mount when the saved value changes (e.g. saved in another tab) so the draft never goes stale. */}
+      <DayStartForm key={store.settings.dayStartMinutes} saved={store.settings.dayStartMinutes} />
+    </SettingsSection>
+  )
+}
+
+function DayStartForm({ saved }: { saved: number }) {
+  const store = useStore()
+  const run = useAction()
+  const { t } = store.i18n
+  const [draft, setDraft] = useState(saved)
+
+  return (
+    <form
+      className="flex flex-col gap-4"
+      onSubmit={(e) => {
+        e.preventDefault()
+        void run(() => store.updateSettings((s) => ({ ...s, dayStartMinutes: draft })), { success: t('settings.saved') })
+      }}
+    >
+      <DayStartField value={draft} onChange={setDraft} />
+      <Notice icon={<Info />}>{t('dayStart.settingsNote')}</Notice>
+      <Button type="submit" size="lg" className="self-start" disabled={draft === saved}>
+        {t('common.save')}
+      </Button>
+    </form>
   )
 }
 

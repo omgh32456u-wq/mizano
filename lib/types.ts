@@ -154,6 +154,11 @@ export interface Settings {
   targets: Targets
   mealNames: Partial<Record<MealSlot, string>>
   favorites: string[]
+  /**
+   * Minutes after local midnight at which a nutrition day starts (0 = midnight). Decides which day
+   * new entries and "today" belong to; entries keep the day they were logged under.
+   */
+  dayStartMinutes: number
 }
 
 export interface AppData {

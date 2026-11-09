@@ -295,6 +295,12 @@ export const en = {
   'settings.mealNames.hint': 'Rename meal sections. Leave empty to use the default.',
   'settings.saved': 'Saved',
 
+  'dayStart.title': 'Nutrition day',
+  'dayStart.label': 'Daily tracking start time',
+  'dayStart.hint': 'Any food logged before your selected start time counts toward the previous day.',
+  'dayStart.window': 'Each day lasts 24 hours: from {start} until {end} the next day.',
+  'dayStart.settingsNote': 'Changing this never moves or deletes entries you already logged. It only decides which day new entries go to.',
+
   'targets.title': 'Daily targets',
   'targets.optional': 'Optional',
   'targets.enable': 'Show daily targets',
@@ -357,6 +363,8 @@ export const en = {
   'onboarding.profile': 'Optional details',
   'onboarding.profile.hint': 'Only needed if you want an optional energy estimate later. Skip if you just want to log food.',
   'onboarding.minorNote': 'Food logging and totals are fully available. Personal calorie targets are not offered for under-18s.',
+  'onboarding.dayStart': 'When does your day start?',
+  'onboarding.dayStart.hint': 'Choose when you want each day of tracking to begin. You can change this any time in Settings.',
   'onboarding.finish': 'Start logging',
   'onboarding.privacy': 'Your data stays on this device.',
 

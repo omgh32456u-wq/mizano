@@ -1,3 +1,4 @@
+import { DEFAULT_DAY_START_MINUTES, normalizeDayStart } from './nutrition-day'
 import type { Settings } from './types'
 
 export function createId(prefix = ''): string {
@@ -32,6 +33,7 @@ export function defaultSettings(): Settings {
     },
     mealNames: {},
     favorites: [],
+    dayStartMinutes: DEFAULT_DAY_START_MINUTES,
   }
 }
 
@@ -46,6 +48,8 @@ export function normalizeSettings(raw: Partial<Settings> | undefined): Settings 
     targets: { ...d.targets, ...(raw.targets ?? {}) },
     mealNames: { ...(raw.mealNames ?? {}) },
     favorites: Array.isArray(raw.favorites) ? raw.favorites.filter((x) => typeof x === 'string') : [],
+    // Settings saved before this field existed (and any invalid value) keep the midnight day boundary.
+    dayStartMinutes: normalizeDayStart(raw.dayStartMinutes),
   }
 }
 

@@ -42,7 +42,13 @@ export function createTranslator(locale: Locale) {
   const fmtDate = (key: string, opts: Intl.DateTimeFormatOptions) =>
     new Intl.DateTimeFormat(tag, opts).format(parseDateKey(key))
 
-  return { t, fmtNum, fmtDate, locale, dir: dirFor(locale), tag }
+  /** Formats minutes after midnight as a locale time ("6:00 AM" / "٦:٠٠ ص"); UTC keeps it independent of the device timezone. */
+  const fmtTime = (minutes: number) =>
+    new Intl.DateTimeFormat(tag, { hour: 'numeric', minute: '2-digit', timeZone: 'UTC' }).format(
+      new Date(Date.UTC(2000, 0, 1, Math.floor(minutes / 60), minutes % 60)),
+    )
+
+  return { t, fmtNum, fmtDate, fmtTime, locale, dir: dirFor(locale), tag }
 }
 
 export type Translator = ReturnType<typeof createTranslator>

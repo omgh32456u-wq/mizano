@@ -297,6 +297,12 @@ export const ar: Record<MessageKey, string> = {
   'settings.mealNames.hint': 'أعد تسمية أقسام الوج����ات. اتركها فارغة لاستخدام الاسم الافتراضي.',
   'settings.saved': 'تم الحفظ',
 
+  'dayStart.title': 'اليوم الغذائي',
+  'dayStart.label': 'وقت بداية التتبع اليومي',
+  'dayStart.hint': 'أي طعام تسجّله قبل وقت البداية الذي اخترته يُحتسب ضمن اليوم السابق.',
+  'dayStart.window': 'يمتد كل يوم 24 ساعة: من {start} حتى {end} من اليوم التالي.',
+  'dayStart.settingsNote': 'تغيير هذا الإعداد لا ينقل ولا يحذف الإدخالات التي سجّلتها بالفعل، وإنما يحدد اليوم الذي تُسجَّل فيه الإدخالات الجديدة فقط.',
+
   'targets.title': 'الأهداف اليومية',
   'targets.optional': 'اختياري',
   'targets.enable': 'عرض الأهداف اليومية',
@@ -359,6 +365,8 @@ export const ar: Record<MessageKey, string> = {
   'onboarding.profile': 'تفاصيل اختيارية',
   'onboarding.profile.hint': 'مطلوبة فقط إذا أردت تقديرًا اختياريًا للطاقة لاحقًا. تخطَّ إذا كنت تريد تسجيل الطعام فقط.',
   'onboarding.minorNote': 'تسجيل الطعام والإجماليات متاحة بالكامل. لا تُقدَّم أهداف سعرات شخصية لمن هم دون 18 عامًا.',
+  'onboarding.dayStart': 'متى يبدأ يومك؟',
+  'onboarding.dayStart.hint': 'اختر الوقت الذي تريد أن يبدأ فيه كل يوم من التتبع. يمكنك تغييره في أي وقت من الإعدادات.',
   'onboarding.finish': 'ابدأ التسجيل',
   'onboarding.privacy': 'بياناتك تبقى على هذا الجهاز.',
 

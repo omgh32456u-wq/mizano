@@ -2,8 +2,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { mergeData } from '@/lib/backup'
-import { todayKey } from '@/lib/dates'
 import { createId, defaultSettings, normalizeSettings, PREFS_STORAGE_KEY } from '@/lib/defaults'
+import { groupLogsByDate, nutritionDayKey } from '@/lib/nutrition-day'
 import { REMINDERS_STORAGE_KEY } from '@/lib/reminders'
 import { buildSeedFoods, SEED_VERSION } from '@/lib/foods-seed'
 import { createTranslator, type Translator } from '@/lib/i18n'
@@ -122,7 +122,9 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<StoreState>(EMPTY)
   const dbRef = useRef<Database | null>(null)
   const channelRef = useRef<BroadcastChannel | null>(null)
-  const [today, setToday] = useState(() => todayKey())
+  // "today" is the current nutrition day: the calendar day shifted by the user's day-start time.
+  const dayStartMinutes = state.settings.dayStartMinutes
+  const [today, setToday] = useState(() => nutritionDayKey(new Date(), defaultSettings().dayStartMinutes))
   const [selectedDate, setSelectedDate] = useState(today)
   const stateRef = useRef(state)
   stateRef.current = state
@@ -178,22 +180,24 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
     }
   }, [reload])
 
-  // Keep "today" correct across midnight and when the app returns from background.
+  // Keep "today" correct across the day boundary, when the app returns from background, and when the
+  // day-start setting loads or changes. Only navigation state moves; no stored entry is touched.
   useEffect(() => {
     const check = () => {
-      const now = todayKey()
+      const now = nutritionDayKey(new Date(), dayStartMinutes)
       setToday((prev) => {
         if (prev !== now) setSelectedDate((sel) => (sel === prev ? now : sel))
         return now
       })
     }
+    check()
     const id = window.setInterval(check, 60_000)
     document.addEventListener('visibilitychange', check)
     return () => {
       window.clearInterval(id)
       document.removeEventListener('visibilitychange', check)
     }
-  }, [])
+  }, [dayStartMinutes])
 
   const { locale, theme } = state.settings
   useEffect(() => {
@@ -351,16 +355,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
 
   const i18n = useMemo(() => createTranslator(locale), [locale])
   const foodsById = useMemo(() => new Map(state.foods.map((f) => [f.id, f])), [state.foods])
-  const logsByDate = useMemo(() => {
-    const map = new Map<string, LogEntry[]>()
-    for (const l of state.logs) {
-      const list = map.get(l.date)
-      if (list) list.push(l)
-      else map.set(l.date, [l])
-    }
-    for (const list of map.values()) list.sort((a, b) => a.createdAt - b.createdAt)
-    return map
-  }, [state.logs])
+  const logsByDate = useMemo(() => groupLogsByDate(state.logs), [state.logs])
 
   const mealNames = state.settings.mealNames
   const mealName = useCallback((slot: MealSlot) => mealNames[slot]?.trim() || i18n.t(`meal.${slot}`), [mealNames, i18n])
