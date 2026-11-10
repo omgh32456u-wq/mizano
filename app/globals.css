@@ -333,6 +333,10 @@
     outline: 2px solid var(--ring);
     outline-offset: 2px;
   }
+  .ob-sex-choice {
+    min-height: 4.25rem;
+    line-height: 1.2;
+  }
   .ob-activity-choice {
     justify-content: flex-start;
     min-height: 2.75rem;
