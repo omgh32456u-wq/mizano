@@ -126,6 +126,7 @@ jobs:
             test -s "$f" || { echo "::error::$f was not generated"; exit 1; }
           done
           grep -q "$APP_ID" android/app/build.gradle || { echo "::error::$APP_ID not found in android/app/build.gradle"; exit 1; }
+          grep -q 'android:allowBackup="false"' android/app/src/main/AndroidManifest.xml || { echo "::error::Android auto-backup must stay disabled; use Mizano's explicit JSON backup"; exit 1; }
           grep -q "\"$APP_ID\"" android/app/src/main/assets/capacitor.config.json || { echo "::error::synced capacitor.config.json has the wrong appId"; exit 1; }
           test -s android/app/src/main/assets/public/index.html || { echo "::error::web assets were not synced into the Android project"; exit 1; }
 
