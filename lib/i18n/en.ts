@@ -362,6 +362,8 @@ export const en = {
   'onboarding.about': 'About you',
   'onboarding.about.hint': 'Your age group decides which features are appropriate. You can change this later.',
   'onboarding.profile': 'Optional details',
+  'onboarding.ready': 'You’re ready to begin',
+  'onboarding.ready.hint': 'You can log food and follow your totals without entering personal profile details. You can adjust your preferences later in Settings.',
   'onboarding.profile.hint': 'Only needed if you want an optional energy estimate later. Skip if you just want to log food.',
   'onboarding.minorNote': 'Food logging and totals are fully available. Personal calorie targets are not offered for under-18s.',
   'onboarding.dayStart': 'When does your day start?',
