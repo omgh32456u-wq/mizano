@@ -138,3 +138,73 @@
     display: none;
   }
 }
+
+
+/* Premium Mizano onboarding motion and tactile number wheels. */
+.mizano-brand-mark {
+  animation: mizano-mark-arrive 900ms cubic-bezier(.2,.8,.2,1) both;
+}
+.mizano-onboarding-card {
+  animation: mizano-card-arrive 700ms cubic-bezier(.2,.8,.2,1) both;
+}
+.mizano-plant-stage {
+  animation: mizano-plant-float 4.8s ease-in-out 900ms infinite;
+}
+.mizano-seed {
+  animation: mizano-seed-grow 2.8s cubic-bezier(.2,.8,.2,1) both;
+}
+.mizano-sprout {
+  transform-origin: 50% 100%;
+  animation: mizano-sprout-rise 1.4s cubic-bezier(.2,.8,.2,1) 700ms both;
+}
+.mizano-leaf-left {
+  transform-origin: 100% 100%;
+  animation: mizano-leaf-open 900ms ease-out 1.45s both;
+}
+.mizano-leaf-right {
+  transform-origin: 0 100%;
+  animation: mizano-leaf-open 900ms ease-out 1.65s both;
+}
+.mizano-stem {
+  transform-origin: 50% 100%;
+  animation: mizano-stem-grow 850ms ease-out 1.1s both;
+}
+.mizano-range {
+  height: 5px;
+  accent-color: #15966a;
+  cursor: pointer;
+}
+@keyframes mizano-mark-arrive {
+  from { opacity: 0; transform: translateY(12px) scale(.82); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes mizano-card-arrive {
+  from { opacity: 0; transform: translateY(18px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes mizano-plant-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+@keyframes mizano-seed-grow {
+  0%, 28% { opacity: 1; transform: scale(1); }
+  65%, 100% { opacity: 0; transform: translateY(-8px) scale(.25); }
+}
+@keyframes mizano-sprout-rise {
+  from { opacity: 0; transform: scaleY(.05); }
+  to { opacity: 1; transform: scaleY(1); }
+}
+@keyframes mizano-leaf-open {
+  from { opacity: 0; scale: .2; }
+  to { opacity: 1; scale: 1; }
+}
+@keyframes mizano-stem-grow {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mizano-brand-mark, .mizano-onboarding-card, .mizano-plant-stage,
+  .mizano-seed, .mizano-sprout, .mizano-leaf-left, .mizano-leaf-right, .mizano-stem {
+    animation: none !important;
+  }
+}
