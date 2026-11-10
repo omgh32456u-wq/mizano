@@ -88,17 +88,92 @@ jobs:
             adb install -r "$APK"
             adb shell pm clear com.omgh32456uwq.mizano
             adb shell monkey -p com.omgh32456uwq.mizano 1
-            sleep 12
-            adb exec-out screencap -p > artifacts/onboarding/01-opening.png
+            sleep 2
+            adb exec-out screencap -p > artifacts/onboarding/01-opening-growth.png
             adb shell input tap 206 450
-            sleep 3
-            adb exec-out screencap -p > artifacts/onboarding/02-welcome.png
-            adb shell input tap 206 760
+            sleep 2
+            adb exec-out screencap -p > artifacts/onboarding/02-welcome-light-en.png
+
+            # Advance by the visible Continue control; coordinates are a fallback if WebView accessibility omits it.
+            adb shell uiautomator dump /sdcard/window.xml >/dev/null 2>&1 || true
+            adb shell cat /sdcard/window.xml > artifacts/onboarding/02-welcome-ui.xml || true
+            python3 - <<'PY'
+            import re, subprocess, xml.etree.ElementTree as ET
+            def tap_text(needle, fallback_x, fallback_y):
+                subprocess.run(["adb", "shell", "uiautomator", "dump", "/sdcard/window.xml"], capture_output=True)
+                try:
+                    raw = subprocess.check_output(["adb", "shell", "cat", "/sdcard/window.xml"], text=True)
+                    root = ET.fromstring(raw)
+                    for node in root.iter("node"):
+                        if needle.casefold() in node.attrib.get("text", "").casefold():
+                            m = re.search(r"\[(\d+),(\d+)\]\[(\d+),(\d+)\]", node.attrib.get("bounds", ""))
+                            if m:
+                                x1,y1,x2,y2 = map(int,m.groups())
+                                subprocess.run(["adb","shell","input","tap",str((x1+x2)//2),str((y1+y2)//2)],check=True)
+                                return
+                except Exception:
+                    pass
+                subprocess.run(["adb","shell","input","tap",str(fallback_x),str(fallback_y)],check=True)
+            tap_text("Continue", 206, 650)
+            PY
             sleep 3
             adb exec-out screencap -p > artifacts/onboarding/03-about.png
-            adb shell input tap 206 760
+
+            # Exercise the adult path and capture the profile wheels + visual choices.
+            adb shell uiautomator dump /sdcard/window.xml >/dev/null 2>&1 || true
+            adb shell cat /sdcard/window.xml > artifacts/onboarding/03-about-ui.xml || true
+            python3 - <<'PY'
+            import re, subprocess, xml.etree.ElementTree as ET
+            def tap_text(needle, fallback_x, fallback_y):
+                subprocess.run(["adb", "shell", "uiautomator", "dump", "/sdcard/window.xml"], capture_output=True)
+                try:
+                    raw = subprocess.check_output(["adb", "shell", "cat", "/sdcard/window.xml"], text=True)
+                    root = ET.fromstring(raw)
+                    for node in root.iter("node"):
+                        if needle.casefold() in node.attrib.get("text", "").casefold():
+                            m = re.search(r"\[(\d+),(\d+)\]\[(\d+),(\d+)\]", node.attrib.get("bounds", ""))
+                            if m:
+                                x1,y1,x2,y2 = map(int,m.groups())
+                                subprocess.run(["adb","shell","input","tap",str((x1+x2)//2),str((y1+y2)//2)],check=True)
+                                return
+                except Exception:
+                    pass
+                subprocess.run(["adb","shell","input","tap",str(fallback_x),str(fallback_y)],check=True)
+            tap_text("18 or older", 206, 335)
+            tap_text("Continue", 206, 700)
+            PY
             sleep 3
-            adb exec-out screencap -p > artifacts/onboarding/04-profile-or-minor.png
+            adb exec-out screencap -p > artifacts/onboarding/04-adult-profile.png
+
+            # Reset app data to exercise the privacy-safe under-18 path independently.
+            adb shell pm clear com.omgh32456uwq.mizano
+            adb shell monkey -p com.omgh32456uwq.mizano 1
+            sleep 2
+            adb shell input tap 206 450
+            sleep 2
+            python3 - <<'PY'
+            import re, subprocess, xml.etree.ElementTree as ET
+            def tap_text(needle, fallback_x, fallback_y):
+                subprocess.run(["adb", "shell", "uiautomator", "dump", "/sdcard/window.xml"], capture_output=True)
+                try:
+                    raw = subprocess.check_output(["adb", "shell", "cat", "/sdcard/window.xml"], text=True)
+                    root = ET.fromstring(raw)
+                    for node in root.iter("node"):
+                        if needle.casefold() in node.attrib.get("text", "").casefold():
+                            m = re.search(r"\[(\d+),(\d+)\]\[(\d+),(\d+)\]", node.attrib.get("bounds", ""))
+                            if m:
+                                x1,y1,x2,y2 = map(int,m.groups())
+                                subprocess.run(["adb","shell","input","tap",str((x1+x2)//2),str((y1+y2)//2)],check=True)
+                                return
+                except Exception:
+                    pass
+                subprocess.run(["adb","shell","input","tap",str(fallback_x),str(fallback_y)],check=True)
+            tap_text("Continue", 206, 650)
+            tap_text("Under 18", 206, 390)
+            tap_text("Continue", 206, 700)
+            PY
+            sleep 3
+            adb exec-out screencap -p > artifacts/onboarding/05-under18-ready.png
             adb shell dumpsys activity activities > artifacts/onboarding/activity.txt
             adb shell logcat -d -t 2500 > artifacts/onboarding/logcat.txt
 
