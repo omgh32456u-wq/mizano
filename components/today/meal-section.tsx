@@ -78,8 +78,8 @@ export function MealSection({
               >
                 <FoodIcon icon={iconForLoggedItem(e, store.foodsById)} />
                 <div className="flex min-w-0 flex-1 flex-col gap-1">
-                  <span className="flex items-center gap-2">
-                    <span className="truncate text-sm font-medium">{localName(e, locale)}</span>
+                  <span className="flex min-w-0 items-center gap-2">
+                    <span className="min-w-0 truncate text-sm font-medium">{localName(e, locale)}</span>
                     {e.estimated && (
                       <Badge tone="warning" title={t('source.estimate.hint')}>
                         ≈

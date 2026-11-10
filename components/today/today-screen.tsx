@@ -13,6 +13,7 @@ import { useAction } from '@/components/providers/use-action'
 import { createId } from '@/lib/defaults'
 import { localName } from '@/lib/display'
 import { sumItems } from '@/lib/nutrition'
+import { isBeforeDayStart } from '@/lib/nutrition-day'
 import { MEAL_SLOTS, type LoggedItem, type LogEntry, type MealSlot } from '@/lib/types'
 import { DateNav } from './date-nav'
 import { DaySummary } from './day-summary'
@@ -20,8 +21,10 @@ import { IdeaWheelCard } from './idea-wheel'
 import { MealSection } from './meal-section'
 import { NameDialog } from './name-dialog'
 
-export function defaultMealForNow(): MealSlot {
-  const h = new Date().getHours()
+export function defaultMealForNow(dayStartMinutes = 0, now = new Date()): MealSlot {
+  // Still inside the previous nutrition day's window (e.g. 01:00 with a 04:00 start): a late-night snack.
+  if (isBeforeDayStart(now, dayStartMinutes)) return 'snacks'
+  const h = now.getHours()
   if (h < 11) return 'breakfast'
   if (h < 16) return 'lunch'
   if (h < 21) return 'dinner'
@@ -43,10 +46,11 @@ export function TodayScreen() {
   const [editing, setEditing] = useState<LogEntry | null>(null)
   const [saveSlot, setSaveSlot] = useState<MealSlot | null>(null)
 
-  const openAdd = (meal: MealSlot = defaultMealForNow(), target: AddTarget = { kind: 'browse' }) => setSheet({ open: true, meal, target })
+  const dayStart = store.settings.dayStartMinutes
+  const openAdd = (meal: MealSlot = defaultMealForNow(dayStart), target: AddTarget = { kind: 'browse' }) => setSheet({ open: true, meal, target })
 
   const logAgain = async (entry: LogEntry) => {
-    const meal = defaultMealForNow()
+    const meal = defaultMealForNow(dayStart)
     let created: LogEntry[] = []
     await run(
       async () => {
@@ -70,7 +74,8 @@ export function TodayScreen() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    // Extra bottom room on phones so the last meal row is not hidden behind the floating "Add food" button.
+    <div className="flex flex-col gap-5 pb-14 sm:pb-0">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <DateNav />
         <Button size="lg" className="hidden sm:inline-flex" onClick={() => openAdd()}>
@@ -79,8 +84,10 @@ export function TodayScreen() {
         </Button>
       </header>
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:items-start">
-        <div className="flex flex-col gap-5 lg:sticky lg:top-8">
+      {/* grid-cols-1 = minmax(0,1fr): without it the implicit phone column sizes to the widest min-content
+          (the horizontally scrolling "Log again" row), stretching the whole screen past the viewport. */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:items-start">
+        <div className="flex min-w-0 flex-col gap-5 lg:sticky lg:top-8">
           <DaySummary totals={totals} />
 
           {recent.length > 0 && (
@@ -118,7 +125,7 @@ export function TodayScreen() {
           <IdeaWheelCard />
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex min-w-0 flex-col gap-3">
           {entries.length === 0 && (
             <Card>
               <EmptyState

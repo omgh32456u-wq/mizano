@@ -76,7 +76,7 @@ export function FoodsScreen() {
         open={addTarget !== null}
         onOpenChange={(o) => !o && setAddTarget(null)}
         date={store.selectedDate}
-        meal={defaultMealForNow()}
+        meal={defaultMealForNow(store.settings.dayStartMinutes)}
         initial={addTarget ?? { kind: 'browse' }}
       />
       <FoodEditorSheet open={foodEditor.open} food={foodEditor.food} onOpenChange={(open) => setFoodEditor((s) => ({ ...s, open }))} />
@@ -226,7 +226,7 @@ function SavedMealsTab() {
   const [toDelete, setToDelete] = useState<SavedMeal | null>(null)
 
   const logMeal = async (m: SavedMeal) => {
-    const meal = defaultMealForNow()
+    const meal = defaultMealForNow(store.settings.dayStartMinutes)
     let created: LogEntry[] = []
     await run(
       async () => {

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Notice, Segmented } from '@/components/common/controls'
 import { useStore } from '@/components/providers/app-store'
 import { useAction } from '@/components/providers/use-action'
+import { DayStartField } from '@/components/settings/day-start-field'
 import { ProfileForm } from '@/components/settings/profile-form'
 import type { AgeGroup, Locale, Profile, ThemePref, UnitSystem } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -17,9 +18,10 @@ export function Onboarding() {
   const { settings } = store
   const [step, setStep] = useState(0)
   const adult = settings.profile.ageGroup === 'adult'
-  const total = adult ? 3 : 2
+  const total = adult ? 4 : 3
 
   const setPref = (patch: Partial<{ locale: Locale; theme: ThemePref }>) => run(() => store.updateSettings((s) => ({ ...s, ...patch })))
+  const setDayStart = (dayStartMinutes: number) => run(() => store.updateSettings((s) => ({ ...s, dayStartMinutes })))
   const setProfile = (patch: Partial<Profile>) => run(() => store.updateSettings((s) => ({ ...s, profile: { ...s.profile, ...patch } })))
   const finish = (profile?: Profile) =>
     run(() => store.updateSettings((s) => ({ ...s, profile: { ...(profile ?? s.profile), onboarded: true } })))
@@ -133,7 +135,26 @@ export function Onboarding() {
                 <Button variant="outline" size="lg" onClick={() => setStep(0)} aria-label={t('common.back')}>
                   <Back aria-hidden />
                 </Button>
-                <Button size="lg" className="flex-1" onClick={() => (adult ? setStep(2) : finish())}>
+                <Button size="lg" className="flex-1" onClick={() => setStep(2)}>
+                  {t('common.next')}
+                  <Next aria-hidden />
+                </Button>
+              </div>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <div className="flex flex-col gap-2">
+                <h1 className="text-xl font-semibold tracking-tight">{t('onboarding.dayStart')}</h1>
+                <p className="text-sm text-muted-foreground">{t('onboarding.dayStart.hint')}</p>
+              </div>
+              <DayStartField value={settings.dayStartMinutes} onChange={(m) => void setDayStart(m)} />
+              <div className="flex gap-2">
+                <Button variant="outline" size="lg" onClick={() => setStep(1)} aria-label={t('common.back')}>
+                  <Back aria-hidden />
+                </Button>
+                <Button size="lg" className="flex-1" onClick={() => (adult ? setStep(3) : finish())}>
                   {adult ? t('common.next') : t('onboarding.finish')}
                   <Next aria-hidden />
                 </Button>
@@ -141,7 +162,7 @@ export function Onboarding() {
             </>
           )}
 
-          {step === 2 && adult && (
+          {step === 3 && adult && (
             <>
               <div className="flex flex-col gap-2">
                 <h1 className="text-xl font-semibold tracking-tight">{t('onboarding.profile')}</h1>
