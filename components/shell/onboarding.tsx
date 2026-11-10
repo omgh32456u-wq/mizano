@@ -4,7 +4,7 @@ import { useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, Monitor, Moon, ShieldCheck, Sun, Volume2, VolumeX } from 'lucide-react'
 import { Notice } from '@/components/common/controls'
 import { Choice } from '@/components/onboarding/choice'
-import { MizanoMark } from '@/components/onboarding/mizano-plant'
+import { MizanoPlant } from '@/components/onboarding/mizano-plant'
 import { ProfileStep } from '@/components/onboarding/profile-step'
 import { useOpening } from '@/components/onboarding/use-opening'
 import { useStore } from '@/components/providers/app-store'
@@ -15,7 +15,6 @@ import type { AgeGroup, Locale, Profile, ThemePref } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
 const THEME_ICONS = { light: Sun, dark: Moon, system: Monitor } as const
-
 const rv = (i: number): { className: string; style: CSSProperties } => ({ className: 'ob-reveal', style: { '--i': i } as CSSProperties })
 
 function SoundToggle({ on, onToggle, label, className }: { on: boolean; onToggle: () => void; label: string; className?: string }) {
@@ -44,7 +43,7 @@ export function Onboarding() {
   const [step, setStep] = useState(0)
   const [introDone, setIntroDone] = useState(false)
   const adult = settings.profile.ageGroup === 'adult'
-  const total = adult ? 4 : 3
+  const total = 3
 
   const cardRef = useRef<HTMLElement>(null)
   const slotRef = useRef<HTMLDivElement>(null)
@@ -86,10 +85,11 @@ export function Onboarding() {
     <main className="ob-root" data-phase={phase} style={{ '--ob-d': opening.playsIntro && !introDone ? '450ms' : '0ms' } as CSSProperties}>
       <div className="ob-frame">
         <header className="ob-chrome flex items-center gap-3">
-          <div ref={slotRef} className="size-16 shrink-0">
-            <div style={{ opacity: phase === 'ready' ? 1 : 0 }}>
-              <MizanoMark size={64} grow={1} bloom={total > 1 ? step / (total - 1) : 0} />
+          <div className="ob-brand-slot size-16 shrink-0">
+            <div ref={slotRef} className="ob-brand-mark" style={{ opacity: phase === 'ready' ? 1 : 0 }}>
+              <img src="/icon.svg" alt="" />
             </div>
+            <MizanoPlant className="ob-header-plant" grow={1} bloom={step / 2} />
           </div>
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <span className="truncate text-base font-semibold tracking-tight">{t('app.name')}</span>
@@ -107,7 +107,7 @@ export function Onboarding() {
         <div className="ob-card-shell">
           <div className="ob-card-glow" aria-hidden />
           <section ref={cardRef} className="ob-card">
-            <div key={step} className="flex min-w-0 flex-col gap-6">
+            <div key={step} className="flex min-w-0 flex-col gap-5">
               {step === 0 && (
                 <>
                   <div {...rv(0)}>
@@ -180,28 +180,18 @@ export function Onboarding() {
                       <Notice icon={<ShieldCheck />}>{t('onboarding.minorNote')}</Notice>
                     </div>
                   )}
+                  <div {...rv(2)} className="ob-reveal flex flex-col gap-2">
+                    <h2 className="text-sm font-medium">{t('onboarding.dayStart')}</h2>
+                    <p className="text-xs leading-relaxed text-muted-foreground">{t('onboarding.dayStart.hint')}</p>
+                    <DayStartField value={settings.dayStartMinutes} onChange={(m) => void setDayStart(m)} />
+                  </div>
                   <div {...rv(3)} className="ob-reveal">
                     {nav(() => goTo(2), t('common.next'), () => goTo(0))}
                   </div>
                 </>
               )}
 
-              {step === 2 && (
-                <>
-                  <div {...rv(0)}>
-                    <h1 className="text-xl font-semibold tracking-tight text-balance">{t('onboarding.dayStart')}</h1>
-                    <p className="mt-2 text-sm leading-relaxed text-pretty text-muted-foreground">{t('onboarding.dayStart.hint')}</p>
-                  </div>
-                  <div {...rv(1)}>
-                    <DayStartField value={settings.dayStartMinutes} onChange={(m) => void setDayStart(m)} />
-                  </div>
-                  <div {...rv(2)}>
-                    {nav(() => (adult ? goTo(3) : finish()), adult ? t('common.next') : t('onboarding.finish'), () => goTo(1))}
-                  </div>
-                </>
-              )}
-
-              {step === 3 && adult && (
+              {step === 2 && adult && (
                 <>
                   <div {...rv(0)}>
                     <h1 className="text-xl font-semibold tracking-tight text-balance">{t('onboarding.profile')}</h1>
@@ -223,6 +213,17 @@ export function Onboarding() {
                   />
                 </>
               )}
+
+              {step === 2 && !adult && (
+                <>
+                  <div {...rv(0)}>
+                    <h1 className="text-xl font-semibold tracking-tight text-balance">{t('onboarding.ready')}</h1>
+                    <p className="mt-2 text-sm leading-relaxed text-pretty text-muted-foreground">{t('onboarding.ready.hint')}</p>
+                  </div>
+                  <Notice icon={<ShieldCheck />}>{t('onboarding.minorNote')}</Notice>
+                  {nav(() => finish(), t('onboarding.finish'), () => goTo(1))}
+                </>
+              )}
             </div>
           </section>
         </div>
@@ -236,12 +237,7 @@ export function Onboarding() {
       {phase !== 'ready' && (
         <>
           <div ref={bgRef} className="ob-open-bg" data-leaving={phase === 'morph' ? '1' : '0'} onClick={opening.skip}>
-            <SoundToggle
-              on={opening.soundOn}
-              onToggle={opening.toggleSound}
-              label={soundLabel}
-              className="ob-open-sound"
-            />
+            <SoundToggle on={opening.soundOn} onToggle={opening.toggleSound} label={soundLabel} className="ob-open-sound" />
             <button type="button" className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:rounded-lg focus:bg-card focus:px-3 focus:py-2 focus:text-sm" onClick={(e) => { e.stopPropagation(); opening.skip() }}>
               {t('onboarding.opening.skip')}
             </button>
@@ -249,7 +245,9 @@ export function Onboarding() {
           <div ref={logoRef} className="ob-open-logo" aria-hidden>
             <div className="ob-open-halo" />
             <div className="ob-open-logo-in">
-              <MizanoMark size={112} grow={opening.growTarget} growMs={2400} />
+              <div className="ob-open-brand">
+                <img src="/icon.svg" alt="" />
+              </div>
             </div>
           </div>
         </>
