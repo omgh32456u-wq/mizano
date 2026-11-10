@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState, type CSSProperties, type ReactNode } from 'react'
+import { CircleHelp, Mars, Venus } from 'lucide-react'
 import { useStore } from '@/components/providers/app-store'
 import type { ActivityLevel, Profile, Sex } from '@/lib/types'
 import { ageSpec, applyWheelValues, heightSpec, startValues, weightSpec } from '@/lib/wheel'
@@ -104,9 +105,16 @@ export function ProfileStep({
       <div className="ob-reveal flex flex-col gap-2" style={{ '--i': 2 } as CSSProperties}>
         <span className="text-sm font-medium">{t('settings.sex')}</span>
         <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={t('settings.sex')}>
-          {(['female', 'male', 'unspecified'] as const).map((s) => (
-            <Choice key={s} active={sex === s} onClick={() => setSex(s)}>
-              {t(`settings.sex.${s}`)}
+          {(
+            [
+              ['female', Venus],
+              ['male', Mars],
+              ['unspecified', CircleHelp],
+            ] as const
+          ).map(([s, Icon]) => (
+            <Choice key={s} active={sex === s} onClick={() => setSex(s)} className="ob-sex-choice flex-col gap-1.5 py-3">
+              <Icon className="size-[18px]" aria-hidden />
+              <span>{t(`settings.sex.${s}`)}</span>
             </Choice>
           ))}
         </div>
