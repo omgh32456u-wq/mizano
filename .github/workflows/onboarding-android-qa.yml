@@ -1,0 +1,112 @@
+name: Onboarding Android Visual QA
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: onboarding-android-qa-${{ github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-emulator:
+    name: Build, install and capture Android onboarding
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - name: Checkout PR source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools platforms;android-36 build-tools;36.0.0
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build web app
+        run: pnpm build
+
+      - name: Type check
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Sync Capacitor
+        run: pnpm exec cap sync android
+
+      - name: Build debug APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleDebug
+
+      - name: Prepare screenshot folder
+        run: mkdir -p artifacts/onboarding
+
+      - name: Run app on Android Emulator and capture screens
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_7
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            set -eux
+            APK="android/app/build/outputs/apk/debug/app-debug.apk"
+            test -s "$APK"
+            adb shell wm size 412x915
+            adb shell wm density 420
+            adb install -r "$APK"
+            adb shell pm clear com.omgh32456uwq.mizano
+            adb shell monkey -p com.omgh32456uwq.mizano 1
+            sleep 12
+            adb exec-out screencap -p > artifacts/onboarding/01-opening.png
+            adb shell input tap 206 450
+            sleep 3
+            adb exec-out screencap -p > artifacts/onboarding/02-welcome.png
+            adb shell input tap 206 760
+            sleep 3
+            adb exec-out screencap -p > artifacts/onboarding/03-about.png
+            adb shell input tap 206 760
+            sleep 3
+            adb exec-out screencap -p > artifacts/onboarding/04-profile-or-minor.png
+            adb shell dumpsys activity activities > artifacts/onboarding/activity.txt
+            adb shell logcat -d -t 2500 > artifacts/onboarding/logcat.txt
+
+      - name: Upload Android screenshots and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mizano-onboarding-android-visual-qa
+          path: artifacts/onboarding/
+          if-no-files-found: warn
+          retention-days: 14
