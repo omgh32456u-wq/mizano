@@ -175,6 +175,35 @@
   }
 
   /* Logo tile: the Mizano mark's home, identical in the opening and in the header. */
+  .ob-brand-slot {
+    position: relative;
+    display: grid;
+    flex: none;
+    place-items: center;
+  }
+  .ob-brand-mark {
+    position: absolute;
+    inset: 8px;
+    overflow: hidden;
+    border-radius: 20%;
+    box-shadow: 0 8px 20px -10px oklch(0.1 0.04 160 / 0.7);
+    transition: opacity 0.35s ease;
+  }
+  .ob-brand-mark img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .ob-header-plant {
+    position: absolute;
+    inset-inline-end: -3px;
+    bottom: -2px;
+    width: 32px;
+    height: 32px;
+    filter: drop-shadow(0 3px 5px oklch(0.1 0.04 160 / 0.45));
+  }
+
   .ob-tile {
     position: relative;
     display: block;
@@ -260,7 +289,7 @@
   .ob-card {
     position: relative;
     min-width: 0;
-    padding: 1.5rem;
+    padding: clamp(1rem, 4vw, 1.5rem);
     border-radius: 28px;
     border: 1px solid var(--border);
     background: linear-gradient(180deg, color-mix(in oklch, var(--card), white 4%), var(--card));
@@ -304,6 +333,35 @@
     outline: 2px solid var(--ring);
     outline-offset: 2px;
   }
+  .ob-activity-choice {
+    justify-content: flex-start;
+    min-height: 2.75rem;
+  }
+  .ob-activity-dot {
+    flex: none;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 9999px;
+  }
+  .ob-activity-choice[data-tone='yellow'] .ob-activity-dot { background: oklch(0.76 0.15 84); }
+  .ob-activity-choice[data-tone='green'] .ob-activity-dot { background: oklch(0.64 0.15 150); }
+  .ob-activity-choice[data-tone='red'] .ob-activity-dot { background: oklch(0.62 0.19 28); }
+  .ob-activity-choice[data-tone='yellow'][aria-checked='true'] {
+    border-color: oklch(0.72 0.14 84); background: oklch(0.95 0.055 88); color: oklch(0.34 0.08 70);
+    box-shadow: inset 0 0 0 1px oklch(0.72 0.14 84);
+  }
+  .ob-activity-choice[data-tone='green'][aria-checked='true'] {
+    border-color: oklch(0.62 0.15 150); background: oklch(0.94 0.045 150); color: oklch(0.3 0.08 150);
+    box-shadow: inset 0 0 0 1px oklch(0.62 0.15 150);
+  }
+  .ob-activity-choice[data-tone='red'][aria-checked='true'] {
+    border-color: oklch(0.62 0.19 28); background: oklch(0.95 0.045 28); color: oklch(0.38 0.12 28);
+    box-shadow: inset 0 0 0 1px oklch(0.62 0.19 28);
+  }
+  .dark .ob-activity-choice[data-tone='yellow'][aria-checked='true'] { background: oklch(0.32 0.055 84); color: oklch(0.92 0.07 84); }
+  .dark .ob-activity-choice[data-tone='green'][aria-checked='true'] { background: oklch(0.3 0.05 150); color: oklch(0.9 0.06 150); }
+  .dark .ob-activity-choice[data-tone='red'][aria-checked='true'] { background: oklch(0.32 0.065 28); color: oklch(0.92 0.07 28); }
+
   .ob-radio-dot {
     flex: none;
     width: 1.125rem;
@@ -382,7 +440,7 @@
     justify-content: center;
     scroll-snap-align: center;
     scroll-snap-stop: always;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-variant-numeric: tabular-nums;
     color: var(--muted-foreground);
     opacity: 0.4;
@@ -446,7 +504,16 @@
     height: 100%;
     animation: ob-logo-in 1s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
-  .ob-open-logo .ob-tile::after {
+  .ob-open-brand {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 22%;
+    box-shadow: 0 18px 40px -14px oklch(0.05 0.03 160 / 0.75), 0 0 0 1px oklch(1 0 0 / 0.16);
+  }
+  .ob-open-brand img { display: block; width: 100%; height: 100%; object-fit: contain; }
+  .ob-open-logo .ob-open-brand::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -524,7 +591,7 @@
     .ob-reveal,
     .ob-open-halo,
     .ob-open-logo-in,
-    .ob-open-logo .ob-tile::after {
+    .ob-open-logo .ob-open-brand::after {
       animation: none !important;
     }
     .ob-chrome,
