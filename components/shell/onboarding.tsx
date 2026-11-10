@@ -108,7 +108,7 @@ export function Onboarding() {
     ...existing,
     onboarded: true,
     ageGroup: age === null ? 'unspecified' : age < 18 ? 'under18' : 'adult',
-    age,
+    age: age !== null && age >= 18 ? age : null,
     sex,
     heightCm: height,
     weightKg: weight,
