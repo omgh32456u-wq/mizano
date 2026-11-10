@@ -18,7 +18,7 @@ export type OpeningPhase = 'logo' | 'morph' | 'ready'
 
 const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)'
 /** Corner radius of the 112px logo tile (30%) and of the finished card; the card clip animates between them. */
-const LOGO_RADIUS = 34
+const LOGO_RADIUS = 24
 const CARD_RADIUS = 28
 
 const boxOf = (el: Element): Box => {
