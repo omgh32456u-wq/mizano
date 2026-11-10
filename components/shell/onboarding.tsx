@@ -244,6 +244,7 @@ export function Onboarding() {
               {t('onboarding.opening.skip')}
             </button>
           </div>
+          <MizanoPlant className="ob-open-sprout" grow={opening.growTarget} growMs={2400} />
           <div ref={logoRef} className="ob-open-logo" aria-hidden>
             <div className="ob-open-halo" />
             <div className="ob-open-logo-in">
