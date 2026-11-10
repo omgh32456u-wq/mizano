@@ -10,6 +10,9 @@
   --color-carbs: var(--carbs);
   --color-fat: var(--fat);
   --color-energy: var(--energy);
+  --color-hero-foreground: var(--hero-foreground);
+  --color-hero-muted: var(--hero-muted);
+  --color-hero-track: var(--hero-track);
   --color-hero-energy: var(--hero-energy);
   --color-hero-protein: var(--hero-protein);
   --color-hero-carbs: var(--hero-carbs);

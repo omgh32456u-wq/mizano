@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { Plus, RotateCcw, Salad } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { BrandMark } from '@/components/common/brand-mark'
 import { Card, EmptyState } from '@/components/common/controls'
 import { useNutritionFormat } from '@/components/common/nutrition'
 import { useRecentEntries } from '@/components/foods/use-recent'
@@ -76,12 +77,27 @@ export function TodayScreen() {
   return (
     // Extra bottom room on phones so the last meal row is not hidden behind the floating "Add food" button.
     <div className="flex flex-col gap-5 pb-14 sm:pb-0">
-      <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <DateNav />
-        <Button size="lg" className="hidden sm:inline-flex" onClick={() => openAdd()}>
-          <Plus aria-hidden />
-          {t('today.addFood')}
-        </Button>
+      <header className="flex flex-col gap-3">
+        {/* Brand row: the sidebar carries the logo on large screens, so this is phone/tablet only. */}
+        <div className="flex items-center justify-between gap-3 lg:hidden">
+          <div className="flex items-center gap-2.5">
+            <BrandMark className="size-9" />
+            <span className="text-lg font-semibold tracking-tight">{t('app.name')}</span>
+          </div>
+          <Button size="lg" className="hidden sm:inline-flex" onClick={() => openAdd()}>
+            <Plus aria-hidden />
+            {t('today.addFood')}
+          </Button>
+        </div>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0 flex-1 lg:max-w-xl">
+            <DateNav />
+          </div>
+          <Button size="lg" className="hidden lg:inline-flex" onClick={() => openAdd()}>
+            <Plus aria-hidden />
+            {t('today.addFood')}
+          </Button>
+        </div>
       </header>
 
       {/* grid-cols-1 = minmax(0,1fr): without it the implicit phone column sizes to the widest min-content
@@ -91,10 +107,10 @@ export function TodayScreen() {
           <DaySummary totals={totals} />
 
           {recent.length > 0 && (
-            <Card className="flex flex-col gap-3 p-4" aria-labelledby="recent-title">
+            <Card className="flex animate-rise flex-col gap-3 p-4 [animation-delay:120ms]" aria-labelledby="recent-title">
               <div className="flex flex-col gap-0.5">
                 <h2 id="recent-title" className="flex items-center gap-2 text-sm font-semibold">
-                  <RotateCcw className="size-4 text-muted-foreground" aria-hidden />
+                  <RotateCcw className="size-4 text-primary" aria-hidden />
                   {t('today.recent')}
                 </h2>
                 <p className="text-xs text-muted-foreground">{t('today.recent.hint')}</p>
@@ -105,7 +121,7 @@ export function TodayScreen() {
                     <button
                       type="button"
                       onClick={() => void logAgain(entry)}
-                      className="flex max-w-56 flex-col items-start gap-0.5 rounded-xl border bg-background px-3 py-2 text-start transition-colors hover:border-primary hover:bg-accent"
+                      className="flex max-w-56 flex-col items-start gap-0.5 rounded-2xl border bg-background px-3.5 py-2.5 text-start transition-all duration-200 hover:border-primary/50 hover:bg-accent hover:shadow-soft active:scale-[0.97]"
                       aria-label={`${t('today.recent')}: ${localName(entry, locale)}, ${f.kcal(entry.nutrients.kcal)} ${t('unit.kcal')}`}
                     >
                       <span className="flex max-w-full items-center gap-1.5 text-sm font-medium">
@@ -125,9 +141,10 @@ export function TodayScreen() {
           <IdeaWheelCard />
         </div>
 
-        <div className="flex min-w-0 flex-col gap-3">
+        {/* Tablets (md) lay the four meals out two-up; phones and the desktop right column stay single-column. */}
+        <div className="grid min-w-0 grid-cols-1 gap-3 md:grid-cols-2 md:items-start lg:grid-cols-1">
           {entries.length === 0 && (
-            <Card>
+            <Card className="animate-rise md:col-span-2 lg:col-span-1">
               <EmptyState
                 icon={<Salad className="size-6" />}
                 title={t('today.empty.title')}
@@ -141,10 +158,11 @@ export function TodayScreen() {
               />
             </Card>
           )}
-          {MEAL_SLOTS.map((slot) => (
+          {MEAL_SLOTS.map((slot, i) => (
             <MealSection
               key={slot}
               slot={slot}
+              index={i}
               entries={entries.filter((e) => e.meal === slot)}
               onAdd={() => openAdd(slot)}
               onEdit={setEditing}
@@ -157,7 +175,7 @@ export function TodayScreen() {
       <Button
         size="lg"
         onClick={() => openAdd()}
-        className="fixed end-4 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-30 h-14 rounded-2xl px-5 shadow-lg sm:hidden"
+        className="fixed end-4 bottom-[calc(5.75rem+env(safe-area-inset-bottom))] z-30 h-14 rounded-2xl px-5 shadow-lift sm:hidden"
       >
         <Plus className="size-5" aria-hidden />
         {t('today.addFood')}
