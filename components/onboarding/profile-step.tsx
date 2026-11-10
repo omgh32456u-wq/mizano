@@ -1,7 +1,6 @@
 'use client'
 
 import { useMemo, useState, type CSSProperties, type ReactNode } from 'react'
-import { Field, NativeSelect } from '@/components/common/controls'
 import { useStore } from '@/components/providers/app-store'
 import type { ActivityLevel, Profile, Sex } from '@/lib/types'
 import { ageSpec, applyWheelValues, heightSpec, startValues, weightSpec } from '@/lib/wheel'
@@ -9,10 +8,17 @@ import { Choice } from './choice'
 import { WheelPicker } from './wheel-picker'
 
 const ACTIVITIES: ActivityLevel[] = ['sedentary', 'light', 'moderate', 'active', 'very_active']
+const ACTIVITY_TONES: Record<ActivityLevel, 'yellow' | 'green' | 'red'> = {
+  sedentary: 'yellow',
+  light: 'yellow',
+  moderate: 'green',
+  active: 'green',
+  very_active: 'red',
+}
 
 /**
- * Optional adult details: age, height and weight on wheels, plus sex and activity. Wheels that stay untouched leave the
- * profile value exactly as it was (see applyWheelValues), so skipping never records a made-up number.
+ * Optional adult details. The wheel values are committed only after interaction; skipping keeps
+ * every untouched profile value unchanged.
  */
 export function ProfileStep({
   initial,
@@ -48,7 +54,7 @@ export function ProfileStep({
 
   return (
     <form
-      className="flex min-w-0 flex-col gap-5"
+      className="flex min-w-0 flex-col gap-4"
       noValidate
       onSubmit={(e) => {
         e.preventDefault()
@@ -59,7 +65,7 @@ export function ProfileStep({
         {t('onboarding.wheel.hint')}
       </p>
 
-      <div className="ob-reveal grid grid-cols-3 gap-2" style={{ '--i': 1 } as CSSProperties}>
+      <div className="ob-reveal grid grid-cols-3 gap-3" style={{ '--i': 1 } as CSSProperties}>
         <WheelPicker
           label={t('onboarding.wheel.age')}
           unit={t('unit.years')}
@@ -95,7 +101,7 @@ export function ProfileStep({
         />
       </div>
 
-      <div className="ob-reveal flex flex-col gap-1.5" style={{ '--i': 2 } as CSSProperties}>
+      <div className="ob-reveal flex flex-col gap-2" style={{ '--i': 2 } as CSSProperties}>
         <span className="text-sm font-medium">{t('settings.sex')}</span>
         <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={t('settings.sex')}>
           {(['female', 'male', 'unspecified'] as const).map((s) => (
@@ -106,19 +112,30 @@ export function ProfileStep({
         </div>
       </div>
 
-      <div className="ob-reveal" style={{ '--i': 3 } as CSSProperties}>
-        <Field label={t('settings.activity')}>
-          {({ id }) => (
-            <NativeSelect id={id} value={activity ?? ''} onChange={(e) => setActivity((e.target.value || null) as ActivityLevel | null)}>
-              <option value="">{t('activity.none')}</option>
-              {ACTIVITIES.map((a) => (
-                <option key={a} value={a}>
-                  {t(`activity.${a}`)}
-                </option>
-              ))}
-            </NativeSelect>
-          )}
-        </Field>
+      <div className="ob-reveal flex flex-col gap-2" style={{ '--i': 3 } as CSSProperties}>
+        <span className="text-sm font-medium">{t('settings.activity')}</span>
+        <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={t('settings.activity')}>
+          {ACTIVITIES.map((a) => (
+            <Choice
+              key={a}
+              active={activity === a}
+              data-tone={ACTIVITY_TONES[a]}
+              className="ob-activity-choice justify-start text-start"
+              onClick={() => setActivity(a)}
+            >
+              <span className="ob-activity-dot" aria-hidden />
+              <span className="min-w-0">{t(`activity.${a}`)}</span>
+            </Choice>
+          ))}
+          <Choice
+            active={activity === null}
+            data-tone="neutral"
+            className="ob-activity-choice col-span-2 justify-center"
+            onClick={() => setActivity(null)}
+          >
+            {t('activity.none')}
+          </Choice>
+        </div>
       </div>
 
       {footer(submit)}
