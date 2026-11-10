@@ -49,7 +49,7 @@ function WheelNumber({
   const ageTone = tone === 'age' && value !== null
     ? value < 18 ? 'border-amber-400/70 bg-amber-400/10 text-amber-700 dark:text-amber-300'
       : value === 18 ? 'border-emerald-500/70 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300'
-      : 'border-border bg-card text-foreground'
+      : 'border-slate-200 bg-white text-slate-900'
     : 'border-border bg-card text-foreground'
 
   return (
