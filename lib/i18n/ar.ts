@@ -364,6 +364,8 @@ export const ar: Record<MessageKey, string> = {
   'onboarding.about': 'عنك',
   'onboarding.about.hint': 'فئتك العمرية تحدد الميزات المناسبة. يمكنك تغييرها لاحقًا.',
   'onboarding.profile': 'تفاصيل اختيارية',
+  'onboarding.ready': 'أنت جاهز للبدء',
+  'onboarding.ready.hint': 'يمكنك تسجيل الطعام ومتابعة الإجماليات دون إدخال تفاصيل شخصية. يمكنك تعديل تفضيلاتك لاحقًا من الإعدادات.',
   'onboarding.profile.hint': 'مطلوبة فقط إذا أردت تقديرًا اختياريًا للطاقة لاحقًا. تخطَّ إذا كنت تريد تسجيل الطعام فقط.',
   'onboarding.minorNote': 'تسجيل الطعام والإجماليات متاحة بالكامل. لا تُقدَّم أهداف سعرات شخصية لمن هم دون 18 عامًا.',
   'onboarding.dayStart': 'متى يبدأ يومك؟',
