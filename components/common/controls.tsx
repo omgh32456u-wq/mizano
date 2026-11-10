@@ -20,7 +20,7 @@ export function Segmented<T extends string>({
   size?: 'sm' | 'md'
 }) {
   return (
-    <div role="radiogroup" aria-label={label} className={cn('flex gap-1 rounded-xl bg-muted p-1', className)}>
+    <div role="radiogroup" aria-label={label} className={cn('flex gap-1 rounded-2xl bg-muted p-1', className)}>
       {options.map((o) => {
         const active = o.value === value
         return (
@@ -31,9 +31,9 @@ export function Segmented<T extends string>({
             aria-checked={active}
             onClick={() => onChange(o.value)}
             className={cn(
-              'flex-1 rounded-lg px-3 font-medium transition-colors focus-visible:outline-2 focus-visible:outline-ring',
+              'flex-1 rounded-xl px-3 font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-ring',
               size === 'sm' ? 'min-h-8 text-xs' : 'min-h-10 text-sm',
-              active ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+              active ? 'bg-card text-foreground shadow-soft' : 'text-muted-foreground hover:text-foreground',
             )}
           >
             {o.label}
@@ -49,7 +49,7 @@ export function NativeSelect({ className, children, ...props }: ComponentProps<'
     <div className="relative">
       <select
         className={cn(
-          'h-11 w-full appearance-none rounded-lg border border-input bg-card ps-3 pe-9 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 disabled:opacity-50',
+          'h-11 w-full appearance-none rounded-xl border border-input bg-card ps-3 pe-9 text-sm outline-none transition-[color,border-color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 disabled:opacity-50',
           className,
         )}
         {...props}
@@ -102,7 +102,7 @@ export function TextInput({ className, ...props }: ComponentProps<'input'>) {
   return (
     <input
       className={cn(
-        'h-11 w-full min-w-0 rounded-lg border border-input bg-card px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 aria-invalid:border-destructive aria-invalid:ring-destructive/20 disabled:opacity-50',
+        'h-11 w-full min-w-0 rounded-xl border border-input bg-card px-3 text-sm outline-none transition-[color,border-color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 aria-invalid:border-destructive aria-invalid:ring-destructive/20 disabled:opacity-50',
         className,
       )}
       {...props}
@@ -121,8 +121,8 @@ export function Chip({ active, className, ...props }: ComponentProps<'button'> &
       type="button"
       aria-pressed={active}
       className={cn(
-        'inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-ring',
-        active ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-foreground hover:bg-muted',
+        'inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border px-3.5 text-sm font-medium whitespace-nowrap transition-all duration-200 focus-visible:outline-2 focus-visible:outline-ring active:scale-[0.97]',
+        active ? 'border-primary bg-primary text-primary-foreground shadow-glow' : 'border-border bg-card text-foreground hover:border-primary/40 hover:bg-accent',
         className,
       )}
       {...props}
@@ -130,8 +130,20 @@ export function Chip({ active, className, ...props }: ComponentProps<'button'> &
   )
 }
 
-export function Card({ className, ...props }: ComponentProps<'section'>) {
-  return <section className={cn('rounded-2xl border bg-card text-card-foreground', className)} {...props} />
+/** Base surface. `hero` is the deep-fern gradient used for the Today summary; `flat` drops the shadow for nested cards. */
+export function Card({ className, variant = 'default', ...props }: ComponentProps<'section'> & { variant?: 'default' | 'hero' | 'flat' }) {
+  return (
+    <section
+      className={cn(
+        'rounded-2xl text-card-foreground',
+        variant === 'default' && 'border bg-card shadow-soft',
+        variant === 'flat' && 'border bg-card',
+        variant === 'hero' && 'surface-hero shadow-lift',
+        className,
+      )}
+      {...props}
+    />
+  )
 }
 
 export function Badge({ tone = 'neutral', className, ...props }: ComponentProps<'span'> & { tone?: 'neutral' | 'primary' | 'warning' }) {
@@ -152,7 +164,7 @@ export function Badge({ tone = 'neutral', className, ...props }: ComponentProps<
 export function EmptyState({ icon, title, body, action }: { icon: ReactNode; title: string; body?: string; action?: ReactNode }) {
   return (
     <div className="flex flex-col items-center gap-3 px-6 py-10 text-center">
-      <div className="flex size-12 items-center justify-center rounded-2xl bg-accent text-accent-foreground" aria-hidden>
+      <div className="flex size-14 items-center justify-center rounded-full bg-accent text-accent-foreground ring-8 ring-accent/40" aria-hidden>
         {icon}
       </div>
       <div className="flex flex-col gap-1">
@@ -168,7 +180,7 @@ export function Notice({ tone = 'muted', icon, children, className }: { tone?: '
   return (
     <div
       className={cn(
-        'flex items-start gap-2 rounded-xl px-3 py-2.5 text-xs leading-relaxed',
+        'flex items-start gap-2 rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed',
         tone === 'warning' ? 'bg-warning text-warning-foreground' : 'bg-muted text-muted-foreground',
         className,
       )}
