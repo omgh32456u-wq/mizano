@@ -175,8 +175,9 @@ describe('local timezone and DST boundaries', () => {
       const start = 1 * 60 + 30
       const firstBoundary = nutritionDayBounds('2026-11-01', start).start
       const before = new Date(firstBoundary.getTime() - 1)
-      const repeatedHour = at(2026, 11, 1, 1, 0)
-      const afterRepeatedHour = at(2026, 11, 1, 1, 45)
+      // Construct instants from the first boundary so these land in the SECOND 01:00 hour (EST).
+      const repeatedHour = new Date(firstBoundary.getTime() + 30 * 60_000)
+      const afterRepeatedHour = new Date(firstBoundary.getTime() + 75 * 60_000)
       expect(nutritionDayKey(before, start)).toBe('2026-10-31')
       expect(nutritionDayKey(firstBoundary, start)).toBe('2026-11-01')
       expect(repeatedHour.getTime()).toBeGreaterThan(firstBoundary.getTime())
@@ -192,7 +193,10 @@ describe('local timezone and DST boundaries', () => {
       () => {
         const start = 2 * 60 + 30
         expect(nutritionDayKey(at(2026, 3, 8, 1, 59), start)).toBe('2026-03-07')
-        expect(nutritionDayKey(at(2026, 3, 8, 3, 0), start)).toBe('2026-03-08')
+        // 02:30 is skipped and resolves to 03:30; 03:00 is still before the boundary.
+        expect(nutritionDayKey(at(2026, 3, 8, 3, 0), start)).toBe('2026-03-07')
+        expect(nutritionDayKey(at(2026, 3, 8, 3, 29), start)).toBe('2026-03-07')
+        expect(nutritionDayKey(at(2026, 3, 8, 3, 30), start)).toBe('2026-03-08')
         expect(nutritionDayBounds('2026-03-07', start).end.getTime()).toBe(nutritionDayBounds('2026-03-08', start).start.getTime())
       },
       () => ctx.skip(),
