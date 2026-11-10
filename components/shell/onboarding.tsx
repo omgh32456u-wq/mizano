@@ -151,7 +151,7 @@ export function Onboarding() {
           ))}
         </div>
 
-        <section className="mizano-onboarding-card flex flex-col gap-6 rounded-[2rem] border border-border/80 bg-card/90 p-5 shadow-2xl shadow-emerald-950/[0.06] backdrop-blur-xl sm:p-7">
+        <section key={step} className="mizano-onboarding-card flex flex-col gap-6 rounded-[2rem] border border-border/80 bg-card/90 p-5 shadow-2xl shadow-emerald-950/[0.06] backdrop-blur-xl sm:p-7">
           {step === 0 && (
             <>
               <div className="flex flex-col items-center gap-3 pb-1 pt-2 text-center">
