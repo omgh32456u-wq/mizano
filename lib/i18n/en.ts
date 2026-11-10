@@ -40,6 +40,7 @@ export const en = {
   'unit.lb': 'lb',
   'unit.cm': 'cm',
   'unit.in': 'in',
+  'unit.years': 'years',
   'unit.serving': 'serving',
   'unit.servings': 'servings',
 
@@ -367,6 +368,13 @@ export const en = {
   'onboarding.dayStart.hint': 'Choose when you want each day of tracking to begin. You can change this any time in Settings.',
   'onboarding.finish': 'Start logging',
   'onboarding.privacy': 'Your data stays on this device.',
+  'onboarding.wheel.age': 'Age',
+  'onboarding.wheel.height': 'Height',
+  'onboarding.wheel.weight': 'Weight',
+  'onboarding.wheel.hint': 'Scroll each wheel to set a value. Anything you leave untouched stays unset.',
+  'onboarding.sound.mute': 'Turn off startup sound',
+  'onboarding.sound.unmute': 'Turn on startup sound',
+  'onboarding.opening.skip': 'Skip intro',
 
   'toast.region': 'Notifications',
 

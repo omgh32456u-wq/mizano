@@ -42,6 +42,7 @@ export const ar: Record<MessageKey, string> = {
   'unit.lb': 'رطل',
   'unit.cm': 'سم',
   'unit.in': 'بوصة',
+  'unit.years': 'سنة',
   'unit.serving': 'حصة',
   'unit.servings': 'حصص',
 
@@ -369,6 +370,13 @@ export const ar: Record<MessageKey, string> = {
   'onboarding.dayStart.hint': 'اختر الوقت الذي تريد أن يبدأ فيه كل يوم من التتبع. يمكنك تغييره في أي وقت من الإعدادات.',
   'onboarding.finish': 'ابدأ التسجيل',
   'onboarding.privacy': 'بياناتك تبقى على هذا الجهاز.',
+  'onboarding.wheel.age': 'العمر',
+  'onboarding.wheel.height': 'الطول',
+  'onboarding.wheel.weight': 'الوزن',
+  'onboarding.wheel.hint': 'مرّر كل عجلة لاختيار قيمة. أي قيمة لا تغيّرها تبقى غير محددة.',
+  'onboarding.sound.mute': 'إيقاف صوت البداية',
+  'onboarding.sound.unmute': 'تشغيل صوت البداية',
+  'onboarding.opening.skip': 'تخطي المقدمة',
 
   'wheel.title': 'عجلة الأفكار',
   'wheel.hint': 'فكرة طعام أو وصفة أو نشاط بشكل عشوائي.',
