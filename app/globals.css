@@ -503,6 +503,10 @@
     opacity: 0.94;
     pointer-events: none;
     filter: drop-shadow(0 8px 12px oklch(0.05 0.03 160 / 0.55));
+    transition: opacity 0.35s ease;
+  }
+  .ob-root:not([data-phase='logo']) .ob-open-sprout {
+    opacity: 0;
   }
   .ob-open-logo {
     position: fixed;
