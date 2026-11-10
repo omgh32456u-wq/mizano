@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
-import { AlertTriangle, BookOpen, CalendarDays, ChartColumn, Leaf, Settings } from 'lucide-react'
+import { AlertTriangle, BookOpen, CalendarDays, ChartColumn, Settings } from 'lucide-react'
+import { BrandMark } from '@/components/common/brand-mark'
 import { useStore } from '@/components/providers/app-store'
 import type { MessageKey } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
@@ -27,11 +28,12 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   if (store.status === 'loading') {
     return (
-      <div className="flex min-h-dvh flex-col items-center justify-center gap-3" role="status" aria-live="polite">
-        <div className="flex size-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-          <Leaf className="size-6 animate-pulse" aria-hidden />
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-4" role="status" aria-live="polite">
+        <div className="relative">
+          <span className="absolute inset-0 animate-ping rounded-[28%] bg-primary/25 motion-reduce:hidden" aria-hidden />
+          <BrandMark className="relative size-16 shadow-lift" />
         </div>
-        <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
+        <p className="animate-fade-in text-sm text-muted-foreground">{t('common.loading')}</p>
       </div>
     )
   }
@@ -42,7 +44,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="flex min-h-dvh flex-col items-center justify-center gap-4 p-6 text-center" role="alert">
         <AlertTriangle className={cn('size-8', store.status === 'error' ? 'text-destructive' : 'text-warning')} aria-hidden />
         <p className="max-w-sm text-sm">{t(message)}</p>
-        <button type="button" className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground" onClick={() => window.location.reload()}>
+        <button type="button" className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-glow" onClick={() => window.location.reload()}>
           {t(store.status === 'error' ? 'common.retry' : 'data.reload')}
         </button>
       </div>
@@ -53,13 +55,11 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-dvh lg:flex">
-      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-6 border-e bg-card px-4 py-6 lg:flex">
-        <div className="flex items-center gap-2.5 px-2">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <Leaf className="size-5" aria-hidden />
-          </div>
+      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-8 border-e bg-card/70 px-4 py-7 backdrop-blur-md lg:flex">
+        <div className="flex items-center gap-3 px-2">
+          <BrandMark className="size-10" />
           <div className="flex min-w-0 flex-col">
-            <span className="truncate text-sm font-semibold">{t('app.name')}</span>
+            <span className="truncate text-base font-semibold tracking-tight">{t('app.name')}</span>
             <span className="truncate text-xs text-muted-foreground">{t('onboarding.privacy')}</span>
           </div>
         </div>
@@ -72,10 +72,11 @@ export function AppShell({ children }: { children: ReactNode }) {
                 href={href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors',
-                  active ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                  'group relative flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-all duration-200',
+                  active ? 'bg-accent text-accent-foreground shadow-soft' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
+                {active && <span className="absolute inset-y-2.5 start-0 w-1 rounded-full bg-primary" aria-hidden />}
                 <Icon className="size-5" aria-hidden />
                 {t(label)}
               </Link>
@@ -91,16 +92,16 @@ export function AppShell({ children }: { children: ReactNode }) {
             {t('data.notPersistent')}
           </div>
         )}
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[calc(6rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-10 lg:pt-8 lg:pb-12">
+        <main className="mx-auto w-full max-w-5xl flex-1 px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[calc(7rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-10 lg:pt-8 lg:pb-12">
           {children}
         </main>
       </div>
 
       <nav
         aria-label={t('nav.main')}
-        className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur supports-backdrop-filter:bg-card/85 lg:hidden"
+        className="glass fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-md rounded-3xl shadow-lift lg:hidden"
       >
-        <ul className="mx-auto grid max-w-lg grid-cols-4">
+        <ul className="grid grid-cols-4 p-1.5">
           {NAV.map(({ href, label, icon: Icon }) => {
             const active = isActive(pathname, href)
             return (
@@ -109,13 +110,11 @@ export function AppShell({ children }: { children: ReactNode }) {
                   href={href}
                   aria-current={active ? 'page' : undefined}
                   className={cn(
-                    'flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium transition-colors',
-                    active ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
+                    'flex h-14 flex-col items-center justify-center gap-0.5 rounded-2xl text-[11px] font-medium transition-all duration-200 active:scale-95',
+                    active ? 'bg-primary/12 text-primary' : 'text-muted-foreground hover:text-foreground',
                   )}
                 >
-                  <span className={cn('flex h-7 w-14 items-center justify-center rounded-full transition-colors', active && 'bg-accent')}>
-                    <Icon className="size-5" aria-hidden />
-                  </span>
+                  <Icon className={cn('size-5 transition-transform duration-200', active && 'scale-110')} aria-hidden />
                   {t(label)}
                 </Link>
               </li>

@@ -10,6 +10,10 @@
   --color-carbs: var(--carbs);
   --color-fat: var(--fat);
   --color-energy: var(--energy);
+  --color-hero-energy: var(--hero-energy);
+  --color-hero-protein: var(--hero-protein);
+  --color-hero-carbs: var(--hero-carbs);
+  --color-hero-fat: var(--hero-fat);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
   --color-chart-5: var(--chart-5);
@@ -42,32 +46,64 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Elevation: soft, green-tinted shadows (light) / deeper ambient shadows (dark). */
+  --shadow-soft: var(--elev-soft);
+  --shadow-lift: var(--elev-lift);
+  --shadow-glow: var(--elev-glow);
+
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-rise: rise 0.55s var(--ease-soft) both;
+  --animate-fade-in: fade-in 0.4s var(--ease-soft) both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 }
 
+/*
+ * Mizano palette — botanical wellness: warm ivory + deep fern greens, with a restrained
+ * sage / amber / terracotta / water-blue for the macros. Brand green matches the logo (#1d6b4f).
+ */
 :root {
   color-scheme: light;
-  --background: oklch(0.982 0.006 95);
-  --foreground: oklch(0.22 0.02 155);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.02 155);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.02 155);
-  --primary: oklch(0.46 0.1 158);
-  --primary-foreground: oklch(0.985 0.01 95);
-  --secondary: oklch(0.95 0.012 120);
-  --secondary-foreground: oklch(0.26 0.03 155);
-  --muted: oklch(0.955 0.008 95);
-  --muted-foreground: oklch(0.47 0.02 155);
-  --accent: oklch(0.94 0.03 158);
-  --accent-foreground: oklch(0.3 0.06 158);
+  --background: oklch(0.978 0.009 100);
+  --foreground: oklch(0.235 0.028 160);
+  --card: oklch(0.995 0.004 100);
+  --card-foreground: oklch(0.235 0.028 160);
+  --popover: oklch(0.997 0.003 100);
+  --popover-foreground: oklch(0.235 0.028 160);
+  --primary: oklch(0.45 0.092 162);
+  --primary-foreground: oklch(0.985 0.01 100);
+  --secondary: oklch(0.948 0.014 125);
+  --secondary-foreground: oklch(0.27 0.035 160);
+  --muted: oklch(0.953 0.01 105);
+  --muted-foreground: oklch(0.47 0.022 158);
+  --accent: oklch(0.935 0.03 150);
+  --accent-foreground: oklch(0.3 0.062 160);
   --destructive: oklch(0.56 0.2 27);
-  --border: oklch(0.905 0.01 95);
-  --input: oklch(0.88 0.012 95);
-  --ring: oklch(0.46 0.1 158);
-  --energy: oklch(0.46 0.1 158);
-  --protein: oklch(0.52 0.11 235);
-  --carbs: oklch(0.7 0.14 72);
-  --fat: oklch(0.6 0.15 32);
+  --border: oklch(0.9 0.012 120);
+  --input: oklch(0.875 0.014 115);
+  --ring: oklch(0.5 0.1 162);
+  --energy: oklch(0.45 0.092 162);
+  --protein: oklch(0.52 0.105 232);
+  --carbs: oklch(0.7 0.14 74);
+  --fat: oklch(0.6 0.145 36);
   --warning: oklch(0.96 0.05 85);
   --warning-foreground: oklch(0.42 0.09 65);
   --chart-1: var(--energy);
@@ -75,25 +111,43 @@
   --chart-3: var(--carbs);
   --chart-4: var(--fat);
   --chart-5: oklch(0.6 0.02 155);
-  --radius: 0.75rem;
+  --radius: 0.875rem;
+
+  /* Hero surface (deep fern gradient) and its on-dark macro colours. Same in both themes. */
+  --hero-from: oklch(0.36 0.075 163);
+  --hero-to: oklch(0.27 0.055 168);
+  --hero-foreground: oklch(0.975 0.012 110);
+  --hero-muted: oklch(0.975 0.012 110 / 72%);
+  --hero-track: oklch(1 0 0 / 14%);
+  --hero-energy: oklch(0.9 0.13 148);
+  --hero-protein: oklch(0.82 0.1 225);
+  --hero-carbs: oklch(0.86 0.13 82);
+  --hero-fat: oklch(0.8 0.115 38);
+
+  --glass: oklch(0.995 0.004 100 / 74%);
+  --glass-border: oklch(0.3 0.04 160 / 9%);
+
+  --elev-soft: 0 1px 2px oklch(0.3 0.05 160 / 5%), 0 4px 14px -6px oklch(0.3 0.05 160 / 10%);
+  --elev-lift: 0 2px 4px oklch(0.3 0.05 160 / 6%), 0 14px 32px -12px oklch(0.3 0.06 160 / 22%);
+  --elev-glow: inset 0 1px 0 oklch(1 0 0 / 18%), 0 8px 20px -8px oklch(0.45 0.092 162 / 55%);
 }
 
 .dark {
   color-scheme: dark;
-  --background: oklch(0.165 0.012 160);
-  --foreground: oklch(0.95 0.008 95);
-  --card: oklch(0.205 0.014 160);
-  --card-foreground: oklch(0.95 0.008 95);
-  --popover: oklch(0.225 0.015 160);
-  --popover-foreground: oklch(0.95 0.008 95);
+  --background: oklch(0.168 0.014 165);
+  --foreground: oklch(0.95 0.008 100);
+  --card: oklch(0.21 0.016 165);
+  --card-foreground: oklch(0.95 0.008 100);
+  --popover: oklch(0.23 0.017 165);
+  --popover-foreground: oklch(0.95 0.008 100);
   --primary: oklch(0.76 0.13 158);
   --primary-foreground: oklch(0.18 0.03 160);
-  --secondary: oklch(0.26 0.015 160);
-  --secondary-foreground: oklch(0.93 0.01 95);
-  --muted: oklch(0.25 0.012 160);
-  --muted-foreground: oklch(0.72 0.015 120);
-  --accent: oklch(0.3 0.04 158);
-  --accent-foreground: oklch(0.92 0.04 158);
+  --secondary: oklch(0.26 0.017 165);
+  --secondary-foreground: oklch(0.93 0.01 100);
+  --muted: oklch(0.25 0.014 165);
+  --muted-foreground: oklch(0.72 0.016 125);
+  --accent: oklch(0.31 0.045 160);
+  --accent-foreground: oklch(0.93 0.04 155);
   --destructive: oklch(0.68 0.18 25);
   --border: oklch(1 0 0 / 9%);
   --input: oklch(1 0 0 / 14%);
@@ -104,6 +158,16 @@
   --fat: oklch(0.73 0.13 35);
   --warning: oklch(0.3 0.05 75);
   --warning-foreground: oklch(0.88 0.09 85);
+
+  --hero-from: oklch(0.33 0.065 163);
+  --hero-to: oklch(0.235 0.045 168);
+
+  --glass: oklch(0.22 0.016 165 / 72%);
+  --glass-border: oklch(1 0 0 / 10%);
+
+  --elev-soft: 0 1px 2px oklch(0 0 0 / 30%), 0 4px 14px -6px oklch(0 0 0 / 40%);
+  --elev-lift: 0 2px 4px oklch(0 0 0 / 35%), 0 16px 34px -12px oklch(0 0 0 / 60%);
+  --elev-glow: inset 0 1px 0 oklch(1 0 0 / 28%), 0 8px 22px -8px oklch(0.76 0.13 158 / 45%);
 }
 
 @layer base {
@@ -116,6 +180,11 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: 'tnum' 0;
+    /* Faint botanical wash: two large soft sage/mint glows that follow the theme. */
+    background-image:
+      radial-gradient(60rem 36rem at 100% -10%, color-mix(in oklch, var(--primary) 7%, transparent), transparent 70%),
+      radial-gradient(46rem 30rem at -10% 110%, color-mix(in oklch, var(--carbs) 6%, transparent), transparent 70%);
+    background-attachment: fixed;
   }
   input[type='number']::-webkit-inner-spin-button,
   input[type='number']::-webkit-outer-spin-button {
@@ -137,4 +206,21 @@
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* Frosted surface for floating chrome (bottom nav, date pill). */
+@utility glass {
+  background-color: var(--glass);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  backdrop-filter: blur(18px) saturate(1.5);
+}
+
+/* Deep-fern gradient used by the Today hero. */
+@utility surface-hero {
+  color: var(--hero-foreground);
+  background-image:
+    radial-gradient(22rem 14rem at 100% 0%, oklch(1 0 0 / 10%), transparent 65%),
+    linear-gradient(155deg, var(--hero-from), var(--hero-to));
+  border: 1px solid oklch(1 0 0 / 8%);
 }
