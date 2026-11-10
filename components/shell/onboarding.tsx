@@ -120,7 +120,6 @@ export function Onboarding() {
   const Back = dir === 'rtl' ? ArrowRight : ArrowLeft
   const Next = dir === 'rtl' ? ArrowLeft : ArrowRight
   const minor = age !== null && age < 18
-  const ageCaption = age === null ? t('settings.age') : age < 18 ? t('settings.age.under18') : age === 18 ? '18' : t('settings.age.adult')
 
   return (
     <main className="relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-7">
@@ -212,7 +211,7 @@ export function Onboarding() {
               </div>
 
               <div className="grid grid-cols-3 gap-2">
-                <WheelNumber label={t('settings.age')} value={age} min={15} max={100} initial={18} unit={t('unit.years') === 'unit.years' ? 'years' : t('unit.years')} onChange={setAge} tone="age" />
+                <WheelNumber label={t('settings.age')} value={age} min={15} max={100} initial={18} unit={settings.locale === 'ar' ? 'سنة' : 'years'} onChange={setAge} tone="age" />
                 <WheelNumber label={t('settings.height', { unit: 'cm' })} value={height} min={100} max={230} initial={170} unit="cm" onChange={setHeight} />
                 <WheelNumber label={t('settings.weight', { unit: 'kg' })} value={weight} min={30} max={250} initial={65} unit="kg" onChange={setWeight} />
               </div>
