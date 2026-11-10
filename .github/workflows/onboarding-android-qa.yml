@@ -90,13 +90,14 @@ jobs:
             adb shell monkey -p com.omgh32456uwq.mizano 1
             sleep 2
             adb exec-out screencap -p > artifacts/onboarding/01-opening-growth.png
-            adb shell input tap 206 450
+            sleep 1
+            adb exec-out screencap -p > artifacts/onboarding/02-logo-card-morph.png
             sleep 2
-            adb exec-out screencap -p > artifacts/onboarding/02-welcome-light-en.png
+            adb exec-out screencap -p > artifacts/onboarding/03-welcome-light-en.png
 
             # Advance by the visible Continue control; coordinates are a fallback if WebView accessibility omits it.
             adb shell uiautomator dump /sdcard/window.xml >/dev/null 2>&1 || true
-            adb shell cat /sdcard/window.xml > artifacts/onboarding/02-welcome-ui.xml || true
+            adb shell cat /sdcard/window.xml > artifacts/onboarding/03-welcome-ui.xml || true
             python3 - <<'PY'
             import re, subprocess, xml.etree.ElementTree as ET
             def tap_text(needle, fallback_x, fallback_y):
