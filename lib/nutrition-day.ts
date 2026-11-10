@@ -6,8 +6,8 @@ import type { LogEntry } from './types'
  * (`Settings.dayStartMinutes`, minutes after local midnight; 0 = midnight, the classic calendar day).
  *
  * A day is labelled by the calendar date on which it STARTS, so with a 06:00 start, 02:30 on the 10th
- * still belongs to the day labelled the 9th. Everything works on local wall-clock time, so DST shifts
- * and timezone changes never produce an ambiguous or overlapping boundary.
+ * still belongs to the day labelled the 9th. Boundaries use the runtime's local-time disambiguation consistently: nonexistent spring-forward
+ * times move forward by the DST gap, and repeated fall-back times use their earlier occurrence.
  *
  * Entries store the label they were logged under (`LogEntry.date`) plus their real timestamp
  * (`createdAt`). The boundary only decides which label NEW entries and "today" get; it is never used
@@ -36,9 +36,19 @@ export function parseTimeInput(value: string): number | null {
   return match ? Number(match[1]) * 60 + Number(match[2]) : null
 }
 
-/** True while the wall clock is still inside the previous day's window (before today's start time). */
+/** Resolve a local day-start boundary using the platform's deterministic Date disambiguation.
+ * Nonexistent spring-forward times move forward by the DST gap; repeated fall-back times
+ * use the earlier occurrence. Both the key and bounds use this exact instant.
+ */
+function dayStartBoundary(key: string, dayStartMinutes: number): Date {
+  const m = normalizeDayStart(dayStartMinutes)
+  const [y, mo, d] = key.split('-').map(Number)
+  return new Date(y, mo - 1, d, Math.floor(m / 60), m % 60, 0, 0)
+}
+
+/** True while the instant precedes today's resolved local day-start boundary. */
 export function isBeforeDayStart(now: Date, dayStartMinutes: number): boolean {
-  return now.getHours() * 60 + now.getMinutes() < normalizeDayStart(dayStartMinutes)
+  return now.getTime() < dayStartBoundary(toDateKey(now), dayStartMinutes).getTime()
 }
 
 /** The nutrition-day label (YYYY-MM-DD) that contains the instant `now`. */
@@ -53,12 +63,10 @@ export function nutritionDayKey(now: Date, dayStartMinutes: number): string {
  * (23 or 25 real hours on a DST change day).
  */
 export function nutritionDayBounds(key: string, dayStartMinutes: number): { start: Date; end: Date } {
-  const m = normalizeDayStart(dayStartMinutes)
-  const at = (k: string) => {
-    const [y, mo, d] = k.split('-').map(Number)
-    return new Date(y, mo - 1, d, Math.floor(m / 60), m % 60, 0, 0)
+  return {
+    start: dayStartBoundary(key, dayStartMinutes),
+    end: dayStartBoundary(addDays(key, 1), dayStartMinutes),
   }
-  return { start: at(key), end: at(addDays(key, 1)) }
 }
 
 /** Groups entries by the day label they were stored with, oldest first inside each day. */
