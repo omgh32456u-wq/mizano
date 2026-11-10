@@ -220,7 +220,9 @@ export function Onboarding() {
                     <h1 className="text-xl font-semibold tracking-tight text-balance">{t('onboarding.ready')}</h1>
                     <p className="mt-2 text-sm leading-relaxed text-pretty text-muted-foreground">{t('onboarding.ready.hint')}</p>
                   </div>
-                  <Notice icon={<ShieldCheck />}>{t('onboarding.minorNote')}</Notice>
+                  {settings.profile.ageGroup === 'under18' && (
+                    <Notice icon={<ShieldCheck />}>{t('onboarding.minorNote')}</Notice>
+                  )}
                   {nav(() => finish(), t('onboarding.finish'), () => goTo(1))}
                 </>
               )}
