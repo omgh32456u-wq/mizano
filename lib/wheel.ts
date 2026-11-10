@@ -2,7 +2,7 @@ import { CM_PER_IN, kgToLb, lbToKg } from './nutrition'
 import type { ActivityLevel, Profile, Sex, UnitSystem } from './types'
 
 /** Row height (px) and number of rows shown by the onboarding wheel pickers. Shared by the component and its math. */
-export const WHEEL_ITEM_HEIGHT = 40
+export const WHEEL_ITEM_HEIGHT = 36
 export const WHEEL_VISIBLE_ROWS = 5
 
 /** Validation bounds, identical to the ones ProfileForm enforces in Settings. */
