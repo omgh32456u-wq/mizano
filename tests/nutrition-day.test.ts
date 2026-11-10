@@ -159,6 +159,33 @@ describe('local timezone and DST boundaries', () => {
     )
   })
 
+  it('keeps the skipped-hour key aligned with the resolved boundary', (ctx) => {
+    inZone('America/New_York', () => {
+      const start = 2 * 60 + 30
+      const boundary = nutritionDayBounds('2026-03-08', start).start
+      expect(boundary.getHours()).toBe(3)
+      expect(boundary.getMinutes()).toBe(30)
+      expect(nutritionDayKey(at(2026, 3, 8, 3, 0), start)).toBe('2026-03-07')
+      expect(nutritionDayKey(boundary, start)).toBe('2026-03-08')
+    }, () => ctx.skip())
+  })
+
+  it('does not move the nutrition-day label backwards during a repeated fall-back hour', (ctx) => {
+    inZone('America/New_York', () => {
+      const start = 1 * 60 + 30
+      const firstBoundary = nutritionDayBounds('2026-11-01', start).start
+      const before = new Date(firstBoundary.getTime() - 1)
+      const repeatedHour = at(2026, 11, 1, 1, 0)
+      const afterRepeatedHour = at(2026, 11, 1, 1, 45)
+      expect(nutritionDayKey(before, start)).toBe('2026-10-31')
+      expect(nutritionDayKey(firstBoundary, start)).toBe('2026-11-01')
+      expect(repeatedHour.getTime()).toBeGreaterThan(firstBoundary.getTime())
+      expect(nutritionDayKey(repeatedHour, start)).toBe('2026-11-01')
+      expect(nutritionDayKey(afterRepeatedHour, start)).toBe('2026-11-01')
+      expect(nutritionDayBounds('2026-10-31', start).end.getTime()).toBe(firstBoundary.getTime())
+    }, () => ctx.skip())
+  })
+
   it('stays contiguous when the chosen start time falls in the skipped hour', (ctx) => {
     inZone(
       'America/New_York',
