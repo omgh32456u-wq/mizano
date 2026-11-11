@@ -53,7 +53,7 @@ export function StepTransition({ stepKey, dir, children }: { stepKey: string | n
       {snapshot && (
         <div
           key={`snap-${snapshot.key}`}
-          className="pointer-events-none absolute inset-0 z-10 animate-step-exit"
+          className="pointer-events-none absolute inset-0 z-10"
           style={{ animation: 'step-exit 180ms ease-out both' }}
         >
           {snapshot.node}
@@ -62,19 +62,6 @@ export function StepTransition({ stepKey, dir, children }: { stepKey: string | n
       <div key={current.key} style={enter}>
         {current.node}
       </div>
-      <style>{`
-        @keyframes step-enter {
-          from { opacity: 0; transform: translateY(var(--enter-from, 12px)); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes step-exit {
-          from { opacity: 1; }
-          to { opacity: 0; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          [style*="step-enter"], [style*="step-exit"] { animation: none !important; }
-        }
-      `}</style>
     </div>
   )
 }
