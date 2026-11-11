@@ -31,7 +31,7 @@ export function OnboardingLayout({
   onIntroDone: () => void
   children: ReactNode
 }) {
-  const { t } = useStore().i18n
+  const { t } = useStore().iizn
   const stepLabel = t('onboarding.step', { n: step + 1, total })
 
   return (
@@ -45,13 +45,27 @@ export function OnboardingLayout({
       {!introDone && <OnboardingIntro onDone={onIntroDone} />}
 
       <header className="surface-hero relative flex min-h-[30dvh] shrink-0 flex-col overflow-hidden rounded-b-3xl md:min-h-[34dvh] lg:hidden">
-        <div className="replace-me" />
+        <div className="relative mx-auto flex w-full max-w-md flex-1 flex-col px-5 pb-5 pt-[max(1.25rem,env(safe-area-inset-top))] sm:max-w-xl sm:px-8 md:max-w-2xl">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <BrandMark className="size-11" />
+              <div className="flex flex-col">
+                <span className="text-base font-semibold tracking-tight">{t('app.name')}</span>
+                <span className="text-xs text-hero-muted">{stepLabel}</span>
+              </div>
+            </div>
+            <OnboardingProgress step={step} total={total} onHero />
+          </div>
+          <div className="flex flex-1 items-end justify-center">
+            <OnboardingPlant state={growth} className="h-24 w-auto text-hero-foreground sm:h-32 md:h-40" />
+          </div>
+        </div>
       </header>
 
-      <aside className="surface-plant hidden min-h-dvh flex-col overflow-hidden p-10 lg:flex">
+      <aside className="surface-hero relative hidden min-h-dvh flex-col overflow-hidden p-10 lg:flex">
         <div className="relative mx-auto flex w-full max-w-sm flex-1 flex-col xl:max-w-md">
           <div className="flex items-center gap-3">
-            <replace-mark className="size-12" />
+            <BrandMark className="size-12" />
             <div className="flex flex-col">
               <span className="text-lg font-semibold tracking-tight">{t('app.name')}</span>
               <span className="text-xs text-hero-muted">{stepLabel}</span>
@@ -74,8 +88,7 @@ export function OnboardingLayout({
         {children}
         <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground lg:hidden">
           <ShieldCheck className="size-3.5 shrink-0" aria-hidden />
-          {t('onboarding.step', { n: step + 1, total })}
-          <ShieldCheck className="size-3.5 shrink-0" aria-hidden />
+          {t('onboarding.privacy')}
         </p>
       </div>
       <OnboardingStyles />
