@@ -9,7 +9,6 @@ import { OnboardingProgress } from './onboarding-progress'
 import { OnboardingPlant } from './onboarding-plant'
 import { OnboardingIntro } from './onboarding-intro'
 import { OnboardingStyles } from './onboarding-styles'
-import { usePrefersReducedMotion } from './onboarding-growths'
 import type { GrowthState } from './onboarding-growths'
 
 /**
@@ -32,7 +31,6 @@ export function OnboardingLayout({
   children: ReactNode
 }) {
   const { t } = useStore().i18n
-  const reduced = usePrefersReducedMotion()
   const stepLabel = t('onboarding.step', { n: step + 1, total })
 
   return (
@@ -46,16 +44,10 @@ export function OnboardingLayout({
       {!introDone && <OnboardingIntro onDone={() => undefined} />}
 
       {/* Mobile / tablet visual band */}
-      <header
-        className={cn(
-          'surface-hero relative flex shrink-0 flex-col overflow-hidden rounded-b-3xl',
-          'min-h-[30dvh] md:min-h-[34dvh] lg:hidden',
-        )}
-      header-style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-      >
+      <header className="surface-hero relative flex min-h-[30dvh] shrink-0 flex-col overflow-hidden rounded-b-3xl md:min-h-[34dvh] lg:hidden">
         <div className="relative mx-auto flex w-full max-w-md flex-1 flex-col px-5 pb-5 pt-[max(1.25rem,env(safe-area-inset-top))] sm:max-w-xl sm:px-8 md:max-w-2xl">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
+            +            <div className="flex items-center gap-3">
               <BrandMark className="size-11" />
               <div className="flex flex-col">
                 <span className="text-base font-semibold tracking-tight">{t('app.name')}</span>
@@ -96,13 +88,12 @@ export function OnboardingLayout({
           <OnboardingProgress step={step} total={total} />
         </div>
         {children}
-        <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground lg:hidden">
+        < div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground lg:hidden">
           <ShieldCheck className="size-3.5 shrink-0" aria-hidden />
           {t('onboarding.privacy')}
-        </p>
+        </div>
       </div>
       <OnboardingStyles />
-      {reduced ? null : null}
     </main>
   )
 }
