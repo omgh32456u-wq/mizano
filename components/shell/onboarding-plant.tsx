@@ -10,10 +10,9 @@ import { usePrefersReducedMotion } from './onboarding-growths'
  * (seed -> sprout -> growth -> bloom). Parts stay mounted; opacity/scale
  * transition via CSS, so the illustration never remounts or flashes.
  *
- * Geometry: ground line at y=200; stem grows upward from it; leaves are drawn
- * as quadratic curves forming organic leaf silhouettes in the Mizano leaf
- * idiom (same glyph family as the BrandMark). Bloom keeps the original
- * leaf identity by topping the stem with the brand leaf shape.
+ * Geometry: ground line at y~200; the stem grows upward from the seed; leaves
+ * are quadratic-curve silhouettes in the Mizano leaf idiom (same glyph family
+ * as the BrandMark). Bloom tops the stem with the brand leaf shape.
  */
 
 /** Cumulative visibility per growth state. */
@@ -23,9 +22,6 @@ const REVEAL: Record<GrowthState, { seed: boolean; stem: boolean; leavesLow: boo
   growth: { seed: true, stem: true, leavesLow: true, leavesMid: false, bloom: false },
   bloom: { seed: true, stem: true, leavesLow: true, leavesMid: true, bloom: true },
 }
-
-/** Stroke-dash reveal length for the stem; long enough for the whole path. */
-const STEM_LEN = 220
 
 const part = (on: boolean, delayMs: number, reduced: boolean) => {
   const dur = reduced ? 0 : 700
@@ -56,15 +52,7 @@ export function OnboardingPlant({ state, className }: { state: GrowthState; clas
         strokeLinecap="round"
       />
       {/* Seed */}
-      <ellipse
-        cx="200"
-        cy="196"
-        rx="7"
-        ry="11"
-        style={part(r.seed, 0, reduced)}
-        fill="currentColor"
-        fillOpacity="0.55"
-      />
+      <ellipse cx="200" cy="196" rx="7" ry="11" style={part(r.seed, 0, reduced)} fill="currentColor" fillOpacity="0.55" />
       {/* Stem — grows upward from the seed */}
       <path
         d="M200 196 C196 164 196 130 200 92"
@@ -87,11 +75,7 @@ export function OnboardingPlant({ state, className }: { state: GrowthState; clas
       </g>
       {/* Bloom — the Mizano brand leaf tops the stem */}
       <g style={part(r.bloom, leafDelay + 180, reduced)}>
-        <path
-          d="M200 92 C185 66 187 44 201 24 C215 44 217 66 200 92 Z"
-          fill="currentColor"
-          fillOpacity="0.9"
-        />
+        <path d="M200 92 C185 66 187 44 201 24 C215 44 217 66 200 92 Z" fill="currentColor" fillOpacity="0.9" />
         <path
           d="M200 88 C192 70 192 52 200 34"
           fill="none"
