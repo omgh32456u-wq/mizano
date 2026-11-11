@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useStore } from '@/components/providers/app-store'
 import { useAction } from '@/components/providers/use-action'
 import { OnboardingLayout } from './onboarding-layout'
-import { StepPanel } from './onboarding-steps'
-import type { Locale, Profile, ThemePref } from '@/lib/types'
+import { StepPanel, type StepApi } from './onboarding-steps'
+import { ProfileStep } from './onboarding-step-profile'
+import { StepTransition } from './onboarding-transition'
+import { growthState } from './onboarding-growths'
 
 export function Onboarding() {
   const store = useStore()
@@ -13,6 +15,8 @@ export function Onboarding() {
   const { t, dir } = store.i18n
   const { settings } = store
   const [step, setStep] = useState(0)
+  const [dirMotion, setDirMotion] = useState<1 | -1>(1)
+  const [introDone, setIntroDone] = useState(false)
   const adult = settings.profile.ageGroup === 'adult'
   const total = adult ? 4 : 3
 
@@ -25,21 +29,45 @@ export function Onboarding() {
   const finish = (profile?: Profile) =>
     run(() => store.updateSettings((s) => ({ ...s, profile: { ...(profile ?? s.profile), onboarded: true } })))
 
+  const go = useCallback(
+    (n: number) => {
+      setDirMotion(n >= step ? 1 : -1)
+      setStep(n)
+    },
+    [step],
+  )
+
+  const next = useCallback(() => {
+    if (adult) {
+      if (step === 2) go(3)
+      else if (step < 2) go(step + 1)
+    } else if (step < 2) {
+      go(step + 1)
+    } else {
+      finish()
+    }
+  }, [adult, step, go, finish])
+
+  const api: StepApi = {
+    step,
+    dir,
+    settings,
+    t,
+    setPref,
+    setDayStart,
+    onSetProfile,
+    setStep: go,
+    finish,
+    next,
+  }
+
+  const growth = growthState(step, total)
+
   return (
-    <OnboardingLayout step={step} total={total}>
-      <StepPanel
-        api={{
-          step,
-          dir,
-          settings,
-          t,
-          setPref,
-          setDayStart,
-          onSetProfile,
-          setStep,
-          finish,
-        }}
-      />
+    <OnboardingLayout step={step} total={total} growth={growth} introDone={introDone} onIntroDone={setIntroDone}>
+      <StepTransition stepKey={step} dir={dirMotion}>
+        {step === 3 && adult ? <ProfileStep api={api} /> : <StepPanel api={api} />}
+      </StepTransition>
     </OnboardingLayout>
   )
 }
