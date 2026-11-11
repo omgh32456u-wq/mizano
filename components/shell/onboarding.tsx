@@ -8,6 +8,7 @@ import { StepPanel, type StepApi } from './onboarding-steps'
 import { ProfileStep } from './onboarding-step-profile'
 import { StepTransition } from './onboarding-transition'
 import { growthState } from './onboarding-growths'
+import type { Locale, Profile, ThemePref } from '@/lib/types'
 
 export function Onboarding() {
   const store = useStore()
@@ -44,7 +45,7 @@ export function Onboarding() {
     } else if (step < 2) {
       go(step + 1)
     } else {
-      finish()
+      void finish()
     }
   }, [adult, step, go, finish])
 
@@ -54,9 +55,9 @@ export function Onboarding() {
     settings,
     t,
     setPref,
+    setStep: go,
     setDayStart,
     onSetProfile,
-    setStep: go,
     finish,
     next,
   }
