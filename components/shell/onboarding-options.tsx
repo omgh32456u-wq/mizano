@@ -1,11 +1,11 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
-import { useStore } from '@/components/providers/app-store'
 
 /**
- * Radio-style option card used by language, age group, and theme choices.
- * Uniform selected state: brand border, accent fill, and a leading check
+ * Radio-style option card used by language and age-group choices.
+ * Uniform selected state: brand border, accent fill, and a trailing check
  * (not color alone) so selection is unmistakable in both themes.
  */
 export function OptionCard({
@@ -24,20 +24,19 @@ export function OptionCard({
   hint?: string
   radioLabel: string
   onChange: (v: string) => void
-  icon?: React.ReactNode
+  icon?: ReactNode
   lang?: string
 }) {
-  const { t } = useStore().i18n
   return (
     <button
-      key={value}
       type="button"
       role="radio"
       aria-checked={checked}
+      aria-label={label}
       lang={lang}
       onClick={() => onChange(value)}
       className={cn(
-        'group flex w-full items-center gap-3 rounded-2xl border-2 px-4 text-start text-sm font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+        'flex w-full items-center gap-3 rounded-2xl border-2 px-4 text-start text-sm font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
         checked ? 'border-primary bg-accent text-accent-foreground' : 'border-border bg-card hover:bg-muted',
       )}
     >
@@ -63,7 +62,6 @@ export function OptionCard({
           </svg>
         )}
       </span>
-      <span className="sr-only">{checked ? t('common.loading') : ''}</span>
     </button>
   )
 }
