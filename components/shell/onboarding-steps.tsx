@@ -4,11 +4,9 @@ import { ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Notice, Segmented } from '@/components/common/controls'
 import { DayStartField } from '@/components/settings/day-start-field'
-import { ProfileForm } from '@/components/settings/profile-form'
 import { OptionCard } from './onboarding-options'
 import type { Translator } from '@/lib/i18n'
 import type { AgeGroup, Locale, Profile, Settings, ThemePref, UnitSystem } from '@/lib/types'
-import { cn } from '@/lib/utils'
 
 export interface StepApi {
   step: number
@@ -20,44 +18,53 @@ export interface StepApi {
   onSetProfile: (patch: Partial<Profile>) => void
   setStep: (n: number) => void
   finish: (profile?: Profile) => void
+  /** Advance: 0->1->2->3(adult)/finish(others). Implemented by the controller. */
+  next: () => void
 }
 
-/** Buttons pinned to the bottom of the panel, above safe areas. */
+/** Step heading block, kept uniform across steps. */
+function StepHeader({ title, hint }: { title: string; hint?: string }) {
+  return (
+    <header className="flex flex-col gap-2">
+      <h1 className="text-xl font-semibold tracking-tight text-balance sm:text-2xl">{title}</h1>
+      {hint && <p className="text-sm leading-relaxed text-pretty text-muted-foreground">{hint}</p>}
+    </header>
+  )
+}
+
+/** Nav row pinned to the bottom of the panel. Arrows flip automatically for RTL. */
 function StepActions({ api, showBack = true, label }: { api: StepApi; showBack?: boolean; label: string }) {
-  const { t, dir, setStep } = api
+  const { t, dir, setStep, step } = api
   const Back = dir === 'rtl' ? ArrowRight : ArrowLeft
   const Next = dir === 'rtl' ? ArrowLeft : ArrowRight
   return (
     <div className="mt-auto flex gap-2 pt-2">
       {showBack && (
-        <Button variant="outline" size="lg" onClick={() => setStep(api.step - 1)} aria-label={t('common.back')}>
+        <Button variant="outline" size="lg" onClick={() => setStep(step - 1)} aria-label={t('common.back')}>
           <Back aria-hidden />
         </Button>
       )}
-      <Button size="lg" className="flex-1" onClick={() => api.next()}>
+      <Button size="lg" className="flex-1" onClick={api.next}>
         {label}
-        <Next aria-hidden />
+        {label !== t('onboarding.finish') && <Next aria-hidden />}
       </Button>
     </div>
   )
 }
 
-/** The four onboarding step panels. All handlers arrive via `api`; nothing persists here. */
-export function StepPanel({ api }: { api: StepApi & { next: () => void } }) {
-  const { t, dir, settings, step } = api
+/** Steps 1–3. Step 4 (adult profile) lives in onboarding-step-profile.tsx. */
+export function StepPanel({ api }: { api: StepApi }) {
+  const { t, settings, step } = api
   const adult = settings.profile.ageGroup === 'adult'
 
   return (
     <section className="flex flex-1 flex-col gap-5 rounded-3xl border bg-card p-5 shadow-soft sm:gap-6 sm:p-7">
       {step === 0 && (
         <>
-          <header className="flex flex-col gap-2">
-            <h1 className="text-2xl font-semibold tracking-tight text-balance">{t('onboarding.welcome')}</h1>
-            <p className="text-sm leading-relaxed text-pretty text-muted-foreground">{t('onboarding.stepIntro') ?? ''}</p>
-          </header>
+          <StepHeader title={t('onboarding.welcome')} hint={t('onboarding.intro')} />
           <div className="flex flex-col gap-3">
             <h2 className="text-sm font-medium">{t('settings.language')}</h2>
-            <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={t('settings.language')}>
+            <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2" role="radiogroup" aria-label={t('settings.language')}>
               {(
                 [
                   ['en', 'English', 'LTR'],
@@ -65,6 +72,7 @@ export function StepPanel({ api }: { api: StepApi & { next: () => void } }) {
                 ] as const
               ).map(([value, label, hint]) => (
                 <OptionCard
+                  key={value}
                   value={value}
                   checked={settings.locale === value}
                   label={label}
@@ -91,13 +99,11 @@ export function StepPanel({ api }: { api: StepApi & { next: () => void } }) {
 
       {step === 1 && (
         <>
-          <header className="flex flex-col gap-2">
-            <h1 className="text-xl font-semibold tracking-tight">{t('onboarding.about')}</h1>
-            <p className="text-sm text-muted-foreground">{t('onboarding.about.hint')}</p>
-          </header>
+          <StepHeader title={t('onboarding.about')} hint={t('onboarding.about.hint')} />
           <div className="flex flex-col gap-2" role="radiogroup" aria-label={t('settings.ageGroup')}>
             {(['adult', 'under18', 'unspecified'] as AgeGroup[]).map((g) => (
               <OptionCard
+                key={g}
                 value={g}
                 checked={settings.profile.ageGroup === g}
                 label={t(`settings.age.${g}`)}
@@ -107,12 +113,11 @@ export function StepPanel({ api }: { api: StepApi & { next: () => void } }) {
             ))}
           </div>
           {settings.profile.ageGroup === 'under18' && <Notice icon={<ShieldCheck />}>{t('onboarding.minorNote')}</Notice>}
-          <div className="t('settings.units') && flex flex-col gap-3">
+          <div className="flex flex-col gap-3">
             <h2 className="text-sm font-medium">{t('settings.units')}</h2>
             <Segmented
-              locale={undefined}
               label={t('settings.units')}
-              value={undefined}
+              value={settings.profile.units}
               onChange={(v: UnitSystem) => api.onSetProfile({ units: v })}
               options={(['metric', 'imperial'] as const).map((v) => ({ value: v, label: t(`settings.units.${v}`) }))}
             />
@@ -121,14 +126,10 @@ export function StepPanel({ api }: { api: StepApi & { next: () => void } }) {
         </>
       )}
 
-      {step === helper}
       {step === 2 && (
         <>
-          <header className="flex flex-col gap-2">
-            <h1 className=" SVG-icon font-semibold tracking-tight">{t('onboarding.dayStart')}</h1>
-            <p className="text-sm text-muted-foreground">{t('onboarding.dayStart.hint')}</p>
-          </header>
-          <DayStartField value={setDayStart} onChange={(m) => void api.setDayStart(m)} />
+          <StepHeader title={t('onboarding.dayStart')} hint={t('onboarding.dayStart.hint')} />
+          <DayStartField value={settings.dayStartMinutes} onChange={(m) => void api.setDayStart(m)} />
           <StepActions api={api} label={adult ? t('common.next') : t('onboarding.finish')} />
         </>
       )}
