@@ -5,32 +5,26 @@ import { Button } from '@/components/ui/button'
 import { Notice, Segmented } from '@/components/common/controls'
 import { DayStartField } from '@/components/settings/day-start-field'
 import { ProfileForm } from '@/components/settings/profile-form'
-import type { AgeGroup, Locale, Profile, ThemePref, UnitSystem } from '@/lib/types'
+import type { Translator } from '@/lib/i18n'
+import type { AgeGroup, Locale, Profile, Settings, ThemePref, UnitSystem } from '@/lib/types'
 import { cn } from '@/lib/utils'
-import type { Action } from '@/components/providers/use-action'
 
-export type StepApi = {
+export interface StepApi {
   step: number
   dir: 'ltr' | 'rtl'
-  settings: {
-    locale: Locale
-    theme: ThemePref
-    dayStartMinutes: number
-    units: UnitSystem
-    ageGroup: AgeGroup
-    profile: Profile
-  }
-  t: ReturnType<typeof import('@/lib/i18n').createTranslator>['t']
+  settings: Settings
+  t: Translator['t']
   setPref: (patch: Partial<{ locale: Locale; theme: ThemePref }>) => void
-  setDayStart: (m: number) => void
-  setProfile: (patch: Partial<Profile>) => void
+  setDayStart: (dayStartMinutes: number) => void
+  onSetProfile: (patch: Partial<Profile>) => void
   setStep: (n: number) => void
   finish: (profile?: Profile) => void
 }
 
-export function StepPanel({ api, run }: { api: StepApi; run: Action }) {
+/** The four onboarding step panels. All handlers arrive via `api`; nothing persists here. */
+export function StepPanel({ api }: { api: StepApi }) {
   const { t, dir, settings, step, setStep } = api
-  const adult = settings.ageGroup === 'adult'
+  const adult = settings.profile.ageGroup === 'adult'
   const Back = dir === 'rtl' ? ArrowRight : ArrowLeft
   const Next = dir === 'rtl' ? ArrowLeft : ArrowRight
 
@@ -99,24 +93,24 @@ export function StepPanel({ api, run }: { api: StepApi; run: Action }) {
                 key={g}
                 type="button"
                 role="radio"
-                aria-checked={settings.ageGroup === g}
-                onClick={() => api.setProfile({ ageGroup: g, ...(g !== 'adult' ? { age: null } : {}) })}
+                aria-checked={settings.profile.ageGroup === g}
+                onClick={() => api.onSetProfile({ ageGroup: g, ...(g !== 'adult' ? { age: null } : {}) })}
                 className={cn(
                   'flex h-13 items-center rounded-2xl border-2 px-4 text-start text-sm font-medium transition-colors',
-                  settings.ageGroup === g ? 'border-primary bg-accent text-accent-foreground' : 'border-border hover:bg-muted',
+                  settings.profile.ageGroup === g ? 'border-primary bg-accent text-accent-foreground' : 'border-border hover:bg-muted',
                 )}
               >
                 {t(`settings.age.${g}`)}
               </button>
             ))}
           </div>
-          {settings.ageGroup === 'under18' && <Notice icon={<ShieldCheck />}>{t('onboarding.minorNote')}</Notice>}
+          {settings.profile.ageGroup === 'under18' && <Notice icon={<ShieldCheck />}>{t('onboarding.minorNote')}</Notice>}
           <div className="flex flex-col gap-3">
             <h2 className="text-sm font-medium">{t('settings.units')}</h2>
             <Segmented
               label={t('settings.units')}
               value={settings.profile.units}
-              onChange={(v: UnitSystem) => api.setProfile({ units: v })}
+              onChange={(v: UnitSystem) => api.onSetProfile({ units: v })}
               options={(['metric', 'imperial'] as const).map((v) => ({ value: v, label: t(`settings.units.${v}`) }))}
             />
           </div>
