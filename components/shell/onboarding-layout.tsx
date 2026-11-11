@@ -6,7 +6,6 @@ import { BrandMark } from '@/components/common/brand-mark'
 import { useStore } from '@/components/providers/app-store'
 import { cn } from '@/lib/utils'
 
-/** Decorative botanical motif: the brand leaf glyph at low opacity. Inline SVG, request-free, cheap on low-end Android. */
 export function LeafMotif({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={cn('pointer-events-none select-none', className)} aria-hidden>
@@ -16,7 +15,6 @@ export function LeafMotif({ className }: { className?: string }) {
   )
 }
 
-/** Step indicator dots; onHero swaps to the on-gradient palette used on the deep-fern panels. */
 export function StepProgress({ total, step, onHero = false }: { total: number; step: number; onHero?: boolean }) {
   return (
     <div className="flex gap-1.5" aria-hidden>
@@ -33,18 +31,16 @@ export function StepProgress({ total, step, onHero = false }: { total: number; s
   )
 }
 
-/**
- * Phase 1 responsive onboarding shell:
- * - Mobile: dedicated fern-gradient visual header above, content below, safe-area aware.
- * - Tablet: balanced composition with wider max-widths and a taller visual band.
- * - Desktop: two-column grid — full-height botanical visual column + centered content column.
- */
 export function OnboardingLayout({ step, total, children }: { step: number; total: number; children: ReactNode }) {
   const { t } = useStore().i18n
   const stepLabel = t('onboarding.step', { n: step + 1, total })
+  const backdrop = {
+    backgroundImage:
+      'radial-gradient(46rem 30rem at 100% 100%, color-mix(in oklch, var(--primary) 6%, transparent), transparent 70%), radial-gradient(38rem 26rem at 0% 0%, color-mix(in oklch, var(--primary) 4%, transparent), transparent 70%), radial-gradient(120rem 60rem at 50% 118%, color-mix(in oklch, var(--hero-from) 14%, transparent), transparent 72%)',
+  }
 
   return (
-    <main className="onboarding-canvas relative flex min-h-dvh flex-col lg:grid lg:grid-cols-[0.95fr_1.05fr]">
+    <main style={backdrop} className="relative flex min-h-dvh flex-col lg:grid lg:grid-cols-[0.95fr_1.05fr]">
       <header className="surface-hero relative flex min-h-[26dvh] shrink-0 flex-col overflow-hidden rounded-b-3xl md:min-h-[30dvh] lg:hidden">
         <LeafMotif className="absolute -end-12 -top-12 size-48 rotate-[20deg] text-hero-foreground opacity-[0.07] sm:size-60" />
         <LeafMotif className="absolute -start-14 -bottom-10 size-44 -rotate-[18deg] text-hero-foreground opacity-[0.05] sm:size-56" />
