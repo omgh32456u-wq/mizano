@@ -56,7 +56,7 @@ export function OnboardingLayout({ step, total, children }: { step: number; tota
               <span className="text-base font-semibold tracking-tight">{t('app.name')}</span>
               <span className="text-xs text-hero-muted">{stepLabel}</span>
             </div>
-          </way>
+          </div>
           <StepProgress total={total} step={step} onHero />
         </div>
       </header>
