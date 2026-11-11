@@ -1,0 +1,4 @@
+// Special chars probe: العربية RTL, "quotes", 'single', backticks `, JSX <div className="x">, em-dash —, arrow =>
+const t = `العربية {n} (RTL)`
+export function Probe() { return <div className="rounded-2xl" aria-hidden>{t}</div> }
+/* oklch(0.45 0.092 162) */
