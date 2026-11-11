@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { growthState } from '../components/shell/onboarding-growths'
+import { growthState, GROWTH_STATES } from '../components/shell/onboarding-growths'
+
+const d = (s: string) => GROWTH_STATES.indexOf(s as (typeof GROWTH_STATES)[number])
 
 describe('growthState', () => {
   it('maps the 4-step (adult) flow through seed, sprout, growth, bloom', () => {
@@ -19,15 +21,15 @@ describe('growthState', () => {
     expect(growthState(4, 4)).toBe('bloom')
   })
 
-  it('never goes backwards and advances at most one state per step', () => {
+  it('never goes backwards; the 4-step flow advances one state per step', () => {
     for (const total of [3, 4]) {
       const seq = Array.from({ length: total + 1 }, (_, s) => growthState(s, total))
       seq.forEach((state, i) => {
         if (i === 0) return
-        const d = ['seed', 'sprout', 'growth', 'bloom'].indexOf(state)
-        const dPrev = ['seed', 'sprout', 'growth', 'bloom'].indexOf(seq[i - 1])
-        expect(d - dPrev).toBeGreaterThanOrEqual(0)
-        expect(d - dPrev).toBeLessThanOrEqual(1)
+        const delta = d(state) - d(seq[i - 1])
+        expect(delta).toBeGreaterThanOrEqual(0)
+        // 4-step flow advances exactly one state; 3-step flow may skip `growth` (+2).
+        expect(delta).toBeLessThanOrEqual(total === 3 ? 2 : 1)
       })
     }
   })
