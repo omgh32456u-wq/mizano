@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Notice, Segmented } from '@/components/common/controls'
 import { DayStartField } from '@/components/settings/day-start-field'
 import { ProfileForm } from '@/components/settings/profile-form'
+import { OptionCard } from './onboarding-options'
 import type { Translator } from '@/lib/i18n'
 import type { AgeGroup, Locale, Profile, Settings, ThemePref, UnitSystem } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -21,21 +22,39 @@ export interface StepApi {
   finish: (profile?: Profile) => void
 }
 
-/** The four onboarding step panels. All handlers arrive via `api`; nothing persists here. */
-export function StepPanel({ api }: { api: StepApi }) {
-  const { t, dir, settings, step, setStep } = api
-  const adult = settings.profile.ageGroup === 'adult'
+/** Buttons pinned to the bottom of the panel, above safe areas. */
+function StepActions({ api, showBack = true, label }: { api: StepApi; showBack?: boolean; label: string }) {
+  const { t, dir, setStep } = api
   const Back = dir === 'rtl' ? ArrowRight : ArrowLeft
   const Next = dir === 'rtl' ? ArrowLeft : ArrowRight
+  return (
+    <div className="mt-auto flex gap-2 pt-2">
+      {showBack && (
+        <Button variant="outline" size="lg" onClick={() => setStep(api.step - 1)} aria-label={t('common.back')}>
+          <Back aria-hidden />
+        </Button>
+      )}
+      <Button size="lg" className="flex-1" onClick={() => api.next()}>
+        {label}
+        <Next aria-hidden />
+      </Button>
+    </div>
+  )
+}
+
+/** The four onboarding step panels. All handlers arrive via `api`; nothing persists here. */
+export function StepPanel({ api }: { api: StepApi & { next: () => void } }) {
+  const { t, dir, settings, step } = api
+  const adult = settings.profile.ageGroup === 'adult'
 
   return (
-    <section className="mt-4 flex flex-1 flex-col gap-5 rounded-3xl border bg-card p-6 shadow-soft sm:gap-6 sm:p-7 lg:mt-6 lg:flex-none">
+    <section className="flex flex-1 flex-col gap-5 rounded-3xl border bg-card p-5 shadow-soft sm:gap-6 sm:p-7">
       {step === 0 && (
         <>
-          <div className="flex flex-col gap-2">
+          <header className="flex flex-col gap-2">
             <h1 className="text-2xl font-semibold tracking-tight text-balance">{t('onboarding.welcome')}</h1>
-            <p className="text-sm leading-relaxed text-pretty text-muted-foreground">{t('onboarding.intro')}</p>
-          </div>
+            <p className="text-sm leading-relaxed text-pretty text-muted-foreground">{t('onboarding.stepIntro') ?? ''}</p>
+          </header>
           <div className="flex flex-col gap-3">
             <h2 className="text-sm font-medium">{t('settings.language')}</h2>
             <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={t('settings.language')}>
@@ -45,21 +64,15 @@ export function StepPanel({ api }: { api: StepApi }) {
                   ['ar', 'العربية', 'RTL'],
                 ] as const
               ).map(([value, label, hint]) => (
-                <button
-                  key={value}
-                  type="button"
-                  role="radio"
-                  aria-checked={settings.locale === value}
+                <OptionCard
+                  value={value}
+                  checked={settings.locale === value}
+                  label={label}
+                  hint={hint}
+                  radioLabel={t('settings.language')}
+                  onChange={(v) => api.setPref({ locale: v as Locale })}
                   lang={value}
-                  onClick={() => api.setPref({ locale: value })}
-                  className={cn(
-                    'flex h-16 flex-col items-center justify-center rounded-2xl border-2 text-base font-semibold transition-colors',
-                    settings.locale === value ? 'border-primary bg-accent text-accent-foreground' : 'border-border hover:bg-muted',
-                  )}
-                >
-                  {label}
-                  <span className="text-[10px] font-medium text-muted-foreground">{hint}</span>
-                </button>
+                />
               ))}
             </div>
           </div>
@@ -72,101 +85,51 @@ export function StepPanel({ api }: { api: StepApi }) {
               options={(['light', 'dark', 'system'] as const).map((v) => ({ value: v, label: t(`settings.theme.${v}`) }))}
             />
           </div>
-          <div className="mt-auto flex gap-2">
-            <Button size="lg" className="flex-1" onClick={() => setStep(1)}>
-              {t('common.next')}
-              <Next aria-hidden />
-            </Button>
-          </div>
+          <StepActions api={api} showBack={false} label={t('common.next')} />
         </>
       )}
 
       {step === 1 && (
         <>
-          <div className="flex flex-col gap-2">
+          <header className="flex flex-col gap-2">
             <h1 className="text-xl font-semibold tracking-tight">{t('onboarding.about')}</h1>
             <p className="text-sm text-muted-foreground">{t('onboarding.about.hint')}</p>
-          </div>
+          </header>
           <div className="flex flex-col gap-2" role="radiogroup" aria-label={t('settings.ageGroup')}>
             {(['adult', 'under18', 'unspecified'] as AgeGroup[]).map((g) => (
-              <button
-                key={g}
-                type="button"
-                role="radio"
-                aria-checked={settings.profile.ageGroup === g}
-                onClick={() => api.onSetProfile({ ageGroup: g, ...(g !== 'adult' ? { age: null } : {}) })}
-                className={cn(
-                  'flex h-13 items-center rounded-2xl border-2 px-4 text-start text-sm font-medium transition-colors',
-                  settings.profile.ageGroup === g ? 'border-primary bg-accent text-accent-foreground' : 'border-border hover:bg-muted',
-                )}
-              >
-                {t(`settings.age.${g}`)}
-              </button>
+              <OptionCard
+                value={g}
+                checked={settings.profile.ageGroup === g}
+                label={t(`settings.age.${g}`)}
+                radioLabel={t('settings.ageGroup')}
+                onChange={(v) => api.onSetProfile({ ageGroup: v as AgeGroup, ...(v !== 'adult' ? { age: null } : {}) })}
+              />
             ))}
           </div>
           {settings.profile.ageGroup === 'under18' && <Notice icon={<ShieldCheck />}>{t('onboarding.minorNote')}</Notice>}
-          <div className="flex flex-col gap-3">
+          <div className="t('settings.units') && flex flex-col gap-3">
             <h2 className="text-sm font-medium">{t('settings.units')}</h2>
             <Segmented
+              locale={undefined}
               label={t('settings.units')}
-              value={settings.profile.units}
+              value={undefined}
               onChange={(v: UnitSystem) => api.onSetProfile({ units: v })}
               options={(['metric', 'imperial'] as const).map((v) => ({ value: v, label: t(`settings.units.${v}`) }))}
             />
           </div>
-          <div className="mt-auto flex gap-2">
-            <Button variant="outline" size="lg" onClick={() => setStep(0)} aria-label={t('common.back')}>
-              <Back aria-hidden />
-            </Button>
-            <Button size="lg" className="flex-1" onClick={() => setStep(2)}>
-              {t('common.next')}
-              <Next aria-hidden />
-            </Button>
-          </div>
+          <StepActions api={api} label={t('common.next')} />
         </>
       )}
 
+      {step === helper}
       {step === 2 && (
         <>
-          <div className="flex flex-col gap-2">
-            <h1 className="text-xl font-semibold tracking-tight">{t('onboarding.dayStart')}</h1>
+          <header className="flex flex-col gap-2">
+            <h1 className=" SVG-icon font-semibold tracking-tight">{t('onboarding.dayStart')}</h1>
             <p className="text-sm text-muted-foreground">{t('onboarding.dayStart.hint')}</p>
-          </div>
-          <DayStartField value={settings.dayStartMinutes} onChange={(m) => void api.setDayStart(m)} />
-          <div className="mt-auto flex gap-2">
-            <Button variant="outline" size="lg" onClick={() => setStep(1)} aria-label={t('common.back')}>
-              <Back aria-hidden />
-            </Button>
-            <Button size="lg" className="flex-1" onClick={() => (adult ? setStep(3) : api.finish())}>
-              {adult ? t('common.next') : t('onboarding.finish')}
-              <Next aria-hidden />
-            </Button>
-          </div>
-        </>
-      )}
-
-      {step === 3 && adult && (
-        <>
-          <div className="flex flex-col gap-2">
-            <h1 className="text-xl font-semibold tracking-tight">{t('onboarding.profile')}</h1>
-            <p className="text-sm text-muted-foreground">{t('onboarding.profile.hint')}</p>
-          </div>
-          <ProfileForm
-            initial={settings.profile}
-            showAgeGroup={false}
-            className="flex-1"
-            onSubmit={(p) => api.finish(p)}
-            submitSlot={() => (
-              <div className="mt-auto flex gap-2">
-                <Button type="button" variant="outline" size="lg" onClick={() => api.finish()}>
-                  {t('common.skip')}
-                </Button>
-                <Button type="submit" size="lg" className="flex-1">
-                  {t('onboarding.finish')}
-                </Button>
-              </div>
-            )}
-          />
+          </header>
+          <DayStartField value={setDayStart} onChange={(m) => void api.setDayStart(m)} />
+          <StepActions api={api} label={adult ? t('common.next') : t('onboarding.finish')} />
         </>
       )}
     </section>
