@@ -34,7 +34,7 @@ export function StepTransition({ stepKey, dir, children }: { stepKey: string | n
     } else {
       setSnapshot(null)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- snapshot swap must not re-run on every render
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- children/current identity must not retrigger the swap
   }, [stepKey])
 
   useEffect(() => () => {
@@ -44,18 +44,37 @@ export function StepTransition({ stepKey, dir, children }: { stepKey: string | n
   const enter: CSSProperties = reduced
     ? {}
     : {
-        animation: `step-enter 260ms var(--ease-soft) both`,
-        ['--enter-from' as keyof CSSProperties]: dir === 1 ? '12px' : '-12px',
+        animation: 'step-enter 260ms var(--ease-soft) both',
+        ['--enter-from' as string]: dir === 1 ? '12px' : '-12px',
       }
 
   return (
     <div className="relative">
       {snapshot && (
-        <div className="pointer-events-none absolute inset-0 z-10 animate-fade-out">{snapshot.node}</div>
+        <div
+          key={`snap-${snapshot.key}`}
+          className="pointer-events-none absolute inset-0 z-10 animate-step-exit"
+          style={{ animation: 'step-exit 180ms ease-out both' }}
+        >
+          {snapshot.node}
+        </div>
       )}
       <div key={current.key} style={enter}>
         {current.node}
       </div>
+      <style>{`
+        @keyframes step-enter {
+          from { opacity: 0; transform: translateY(var(--enter-from, 12px)); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes step-exit {
+          from { opacity: 1; }
+          to { opacity: 0; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [style*="step-enter"], [style*="step-exit"] { animation: none !important; }
+        }
+      `}</style>
     </div>
   )
 }
