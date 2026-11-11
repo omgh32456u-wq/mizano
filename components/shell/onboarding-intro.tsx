@@ -7,14 +7,11 @@ import { usePrefersReducedMotion } from './onboarding-growths'
 
 /**
  * One-time brand reveal on first mount of onboarding: the real BrandMark appears
- * in a circle, the circle eases back, and the whole scrim fades out revealing the
- * environment. Runs once per Onboarding mount (returning users with incomplete
- * onboarding see it again; that is acceptable — it is short, and it doubles as the
- * initialization bridge while IndexedDB settles). Reduced motion skips straight to
- * the settled state.
+ * in a circular tile, the circle eases back, and the scrim fades out revealing
+ * the environment. Runs once per Onboarding mount; reduced motion skips it.
  *
- * Duration is short and fixed: the app store gate in AppShell already covers real
- * loading, so this never adds artificial waiting.
+ * The app store gate in AppShell already covers real initialization, so the
+ * fixed timings here never add artificial waiting.
  */
 export function OnboardingIntro({ onDone }: { onDone: () => void }) {
   const reduced = usePrefersReducedMotion()
@@ -43,14 +40,14 @@ export function OnboardingIntro({ onDone }: { onDone: () => void }) {
       <div
         className={cn(
           'absolute inset-0 bg-background transition-opacity duration-500',
-          phase === 'gone' ? 'opacity-0' : 'opacity-100',
+          phase === 'settle' ? 'opacity-0' : 'opacity-100',
         )}
       />
       <div
         style={{
           transition: 'opacity 480ms var(--ease-soft), transform 520ms var(--ease-soft)',
-          opacity: phase === 'reveal' ? 1 : 0,
-          transform: phase === 'reveal' ? 'scale(1)' : 'scale(1.18)',
+          opacity: phase === 'settle' ? 0 : 1,
+          transform: phase === 'settle' ? 'scale(1.18)' : 'scale(1)',
         }}
         className="relative flex size-40 items-center justify-center rounded-full border border-primary/25 bg-card shadow-lift md:size-44"
       >
