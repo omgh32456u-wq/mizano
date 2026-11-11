@@ -65,7 +65,7 @@ export function Onboarding() {
   const growth = growthState(step, total)
 
   return (
-    <OnboardingLayout step={step} total={total} growth={growth} introDone={introDone} onIntroDone={setIntroDone}>
+    <OnboardingLayout step={step} total={total} growth={growth} introDone={introDone} onIntroDone={() => setIntroDone(true)}>
       <StepTransition stepKey={step} dir={dirMotion}>
         {step === 3 && adult ? <ProfileStep api={api} /> : <StepPanel api={api} />}
       </StepTransition>
