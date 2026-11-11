@@ -31,7 +31,7 @@ export function OnboardingLayout({
   onIntroDone: () => void
   children: ReactNode
 }) {
-  const { t } = useStore().iizn
+  const { t } = useStore().i18n
   const stepLabel = t('onboarding.step', { n: step + 1, total })
 
   return (
