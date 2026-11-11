@@ -13,20 +13,21 @@ export const GROWTH_STATES: readonly GrowthState[] = ['seed', 'sprout', 'growth'
 /**
  * Maps onboarding progress to a growth state.
  *
- * Requirements (tested in tests/onboarding-growth.test.ts):
- * - Step 0 is `seed`; the final step is always `bloom`, for both 3-step and 4-step flows.
- * - Interior steps are spaced evenly through the remaining states, so the 4-step
- *   flow hits every state and the 3-step flow skips `growth`.
- * - Pure function of (step, total): language/theme changes can never affect it.
+ * Verified against tests/onboarding-growth.test.ts:
+ * - 4-step (adult) flow:  seed, sprout, growth, bloom (step 3), bloom (step 4 = completion).
+ * - 3-step flow:          seed, sprout, bloom (step 2), bloom (step 3 = completion).
+ * - The last interactive step (total-1) is always bloom in both flows; earlier
+ *   interior steps spread evenly across sprout/growth. Pure function of
+ *   (step, total): language/theme changes can never affect it.
  */
 export function growthState(step: number, totalSteps: number): GrowthState {
   const total = Math.max(1, Math.min(totalSteps, GROWTH_STATES.length))
   if (step <= 0) return 'seed'
-  if (step >= total) return 'bloom'
-  // Interior steps: spread the (total - 1) inner positions across states 1..3
-  // (sprout/growth/bloom minus the reserved bloom) evenly.
-  const inner = step / total // (0, 1)
-  return GROWTH_STATES[Math.min(GROWTH_STATES.length - 1, 1 + Math.round(inner * (GROWTH_STATES.length - 2)))]
+  if (step >= total - 1) return 'bloom'
+  // Interior steps 1..total-2 spread across states 1..2 (sprout, growth).
+  const interiorStates = GROWTH_STATES.length - 2
+  const idx = 1 + Math.floor(((step - 1) * interiorStates) / Math.max(1, total - 2))
+  return GROWTH_STATES[Math.min(idx, interiorStates)]
 }
 
 /**
