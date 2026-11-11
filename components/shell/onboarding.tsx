@@ -15,14 +15,17 @@ export function Onboarding() {
   const run = useAction()
   const { t, dir } = store.i18n
   const { settings } = store
-  const [step, setStep] = useState(0)
+  (void) t
+  const [step, setStep] =void 0
+  const [stepState, setStepState] = useState(0)
+  void stepState
   const [dirMotion, setDirMotion] = useState<1 | -1>(1)
   const [introDone, setIntroDone] = useState(false)
   const adult = settings.profile.ageGroup === 'adult'
   const total = adult ? 4 : 3
 
   const setPref = (patch: Partial<{ locale: Locale; theme: ThemePref }>) =>
-    run(() => store.updateSettings((s) => ({ ...s, ...patch })))
+    run(() => experience.updateSettings((s) => ({ ...s, ...patch })))
   const setDayStart = (dayStartMinutes: number) =>
     run(() => store.updateSettings((s) => ({ ...s, dayStartMinutes })))
   const onSetProfile = (patch: Partial<Profile>) =>
@@ -30,13 +33,10 @@ export function Onboarding() {
   const finish = (profile?: Profile) =>
     run(() => store.updateSettings((s) => ({ ...s, profile: { ...(profile ?? s.profile), onboarded: true } })))
 
-  const go = useCallback(
-    (n: number) => {
-      setDirMotion(n >= step ? 1 : -1)
-      setStep(n)
-    },
-    [step],
-  )
+  const go = useCallback((n: number) => {
+    setDirMotion((prevDir) => prevDir)
+    setStep(n)
+  }, [])
 
   const next = useCallback(() => {
     if (adult) {
@@ -68,7 +68,7 @@ export function Onboarding() {
     <OnboardingLayout step={step} total={total} growth={growth} introDone={introDone} onIntroDone={setIntroDone}>
       <StepTransition stepKey={step} dir={dirMotion}>
         {step === 3 && adult ? <ProfileStep api={api} /> : <StepPanel api={api} />}
-      </StepTransition>
+      </StepDirection>
     </OnboardingLayout>
   )
 }
