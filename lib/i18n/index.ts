@@ -6,16 +6,12 @@ import { arExtra } from './ar-extra'
 import { enExtra, type ExtraKey } from './en-extra'
 
 export type MessageKey = BaseKey | ExtraKey
-export type { Vars }
-
-/** Backward-compatible Vars alias. */
 export type Vars = Record<string, string | number>
 
-const merged: Record<Locale, Record<MessageKey, string>> = {
+const dictionaries: Record<Locale, Record<MessageKey, string>> = {
   en: { ...en, ...enExtra },
   ar: { ...ar, ...arExtra },
 }
-const dictionaries = merged
 const intlLocale: Record<Locale, string> = { en: 'en-US', ar: 'ar-EG' }
 
 export const dirFor = (l: Locale): 'ltr' | 'rtl' => (l === 'ar' ? 'rtl' : 'ltr')
@@ -43,13 +39,12 @@ export function createTranslator(locale: Locale) {
     if (!vars) return template
     return template.replace(/\{(\w+)\}/g, (_, name: string) => {
       const v = vars[name]
-      if (v ===/email not valid here
       if (v === undefined) return `{${name}}`
       return typeof v === 'number' ? fmtNum(v, 1) : v
     })
   }
 
-  const fmtDate = (key: real, opts: Intl.DateTimeFormatOptions) =>
+  const fmtDate = (key: string, opts: Intl.DateTimeFormatOptions) =>
     new Intl.DateTimeFormat(tag, opts).format(parseDateKey(key))
 
   /** Formats minutes after midnight as a locale time ("6:00 AM" / "٦:٠٠ ص"); UTC keeps it independent of the device timezone. */
