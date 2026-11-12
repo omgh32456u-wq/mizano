@@ -89,15 +89,15 @@ export function Wheel({
     >
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-2 top-1/2 -z-10 h-10 -translate-y-1/2 rounded-xl border border-primary/30 bg-card shadow-soft"
+        className="pointer-events-none absolute inset-x-2 top-1/2 z-0 h-10 -translate-y-1/2 rounded-xl border border-primary/25 bg-primary/5"
       />
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 z-10 h-10 bg-gradient-to-b from-card via-card/70 to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 z-20 h-10 bg-gradient-to-b from-card via-card/70 to-transparent"
       />
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-10 bg-gradient-to-t from-card via-card/70 to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-10 bg-gradient-to-t from-card via-card/70 to-transparent"
       />
       <div
         ref={ref}
@@ -106,23 +106,28 @@ export function Wheel({
         tabIndex={disabled ? -1 : 0}
         role="listbox"
         aria-label={label}
-        className="scrollbar-none h-40 snap-y snap-mandatory overflow-y-auto overscroll-contain focus-visible:outline-2 focus-visible:outline-ring"
+        className="relative z-10 scrollbar-none h-40 snap-y snap-mandatory overflow-y-auto overscroll-contain focus-visible:outline-2 focus-visible:outline-ring"
         style={{ paddingTop: EDGE_H, paddingBottom: EDGE_H }}
       >
-        {items.map((it, i) => (
-          <div
-            key={it.value}
-            role="option"
-            aria-selected={i === index}
-            className={cn(
-              'flex h-10 snap-center items-center justify-center text-base tabular-nums transition-transform',
-              i === index ? 'scale-110 font-semibold text-foreground' : 'text-muted-foreground',
-              it.tone,
-            )}
-          >
-            {it.label}
-          </div>
-        ))}
+        {items.map((it, i) => {
+          const selected = i === index
+          return (
+            <div
+              key={it.value}
+              role="option"
+              aria-selected={selected}
+              className={cn(
+                'mx-2 flex h-10 snap-center items-center justify-center rounded-xl text-base tabular-nums transition-[color,background-color,transform,box-shadow] duration-150',
+                selected
+                  ? 'relative z-10 scale-105 bg-primary/10 font-bold text-primary shadow-sm ring-1 ring-inset ring-primary/30'
+                  : 'text-muted-foreground',
+                it.tone,
+              )}
+            >
+              {it.label}
+            </div>
+          )
+        })}
       </div>
     </div>
   )
