@@ -8,9 +8,13 @@ import { enExtra, type ExtraKey } from './en-extra'
 export type MessageKey = BaseKey | ExtraKey
 export type Vars = Record<string, string | number>
 
+// Widen the const dictionaries so MessageKey (which includes ExtraKey) can index them.
+const enAll: Record<MessageKey, string> = { ...en, ...enExtra }
+const arAll: Record<MessageKey, string> = { ...ar, ...arExtra }
+
 const dictionaries: Record<Locale, Record<MessageKey, string>> = {
-  en: { ...en, ...enExtra },
-  ar: { ...ar, ...arExtra },
+  en: enAll,
+  ar: arAll,
 }
 const intlLocale: Record<Locale, string> = { en: 'en-US', ar: 'ar-EG' }
 
@@ -35,7 +39,7 @@ export function createTranslator(locale: Locale) {
   }
 
   const t = (key: MessageKey, vars?: Vars) => {
-    const template = dict[key] ?? en[key] ?? key
+    const template = dict[key] ?? enAll[key] ?? key
     if (!vars) return template
     return template.replace(/\{(\w+)\}/g, (_, name: string) => {
       const v = vars[name]
