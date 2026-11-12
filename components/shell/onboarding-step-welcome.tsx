@@ -44,7 +44,11 @@ export function WelcomeStep({ api }: { api: StepApi }) {
           label={t('settings.theme')}
           value={api.settings.theme}
           onChange={(v) => api.setPref({ theme: v })}
-          options={(['light', 'dark', 'system'] as const).map((v) => ({ value: v, label: t('settings.theme.' + v) }))}
+          options={[
+            { value: 'light', label: t('settings.theme.light') },
+            { value: 'dark', label: t('settings.theme.dark') },
+            { value: 'system', label: t('settings.theme.system') },
+          ]}
         />
       </div>
       <div className="mt-auto flex gap-2 pt-2">
