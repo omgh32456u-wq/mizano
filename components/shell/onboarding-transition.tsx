@@ -6,36 +6,37 @@ import { usePrefersReducedMotion } from './onboarding-growths'
 /**
  * Direction-aware single-panel crossfade/slide for step content.
  *
- * Only the inner step content animates; the shell, plant, and background stay
- * mounted and stable. When the step key changes, the previous content is kept
- * as an absolutely-positioned snapshot (zero layout shift) while the new
- * content rises in; the snapshot then unmounts. No animation library.
+ * The active children are always rendered directly from props so updates to
+ * onboarding settings (language, theme, profile selections, etc.) stay live.
+ * A ref keeps only the last rendered children for the short outgoing snapshot.
  *
  * - Forward: new content enters from 12px below; snapshot fades out.
  * - Backward: new content enters from 12px above.
  * - Reduced motion: instant swap, no timers, no transforms.
- * - Buttons stay responsive: nothing covers the pointer.
+ * - The outgoing snapshot never intercepts pointer input.
  */
 export function StepTransition({ stepKey, dir, children }: { stepKey: string | number; dir: 1 | -1; children: ReactNode }) {
   const reduced = usePrefersReducedMotion()
-  const [current, setCurrent] = useState<{ key: string | number; node: ReactNode }>({ key: stepKey, node: children })
   const [snapshot, setSnapshot] = useState<{ key: string | number; node: ReactNode } | null>(null)
   const lastKey = useRef(stepKey)
+  const previousNode = useRef(children)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    if (stepKey === lastKey.current) return
-    lastKey.current = stepKey
-    setSnapshot(current)
-    setCurrent({ key: stepKey, node: children })
-    if (!reduced) {
+    if (stepKey !== lastKey.current) {
+      setSnapshot(reduced ? null : { key: lastKey.current, node: previousNode.current })
+      lastKey.current = stepKey
+
       if (timer.current) clearTimeout(timer.current)
-      timer.current = setTimeout(() => setSnapshot(null), 280)
-    } else {
-      setSnapshot(null)
+      if (!reduced) {
+        timer.current = setTimeout(() => setSnapshot(null), 280)
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- children/current identity must not retrigger the swap
-  }, [stepKey])
+
+    // Keep the latest rendered version of this step, including live selection
+    // state, so the next transition snapshots the correct outgoing content.
+    previousNode.current = children
+  }, [stepKey, children, reduced])
 
   useEffect(() => () => {
     if (timer.current) clearTimeout(timer.current)
@@ -59,8 +60,8 @@ export function StepTransition({ stepKey, dir, children }: { stepKey: string | n
           {snapshot.node}
         </div>
       )}
-      <div key={current.key} style={enter}>
-        {current.node}
+      <div key={stepKey} style={enter}>
+        {children}
       </div>
     </div>
   )
