@@ -20,15 +20,11 @@ export function OnboardingLayout({
   step,
   total,
   growth,
-  introDone,
-  onIntroDone,
   children,
 }: {
   step: number
   total: number
   growth: GrowthState
-  introDone: boolean
-  onIntroDone: () => void
   children: ReactNode
 }) {
   const { t } = useStore().i18n
@@ -42,7 +38,7 @@ export function OnboardingLayout({
       }}
       className="relative flex min-h-dvh flex-col lg:grid lg:grid-cols-[0.95fr_1.05fr]"
     >
-      {!introDone && <OnboardingIntro onDone={onIntroDone} />}
+      <OnboardingIntro />
 
       <header className="surface-hero relative flex min-h-[30dvh] shrink-0 flex-col overflow-hidden rounded-b-3xl md:min-h-[34dvh] lg:hidden">
         <div className="relative mx-auto flex w-full max-w-md flex-1 flex-col px-5 pb-5 pt-[max(1.25rem,env(safe-area-inset-top))] sm:max-w-xl sm:px-8 md:max-w-2xl">

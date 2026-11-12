@@ -9,6 +9,8 @@ export const arExtra = {
   'auth.guest': 'المتابعة بدون حساب',
   'onboarding.profile.hint2': 'أدر العجلات لتحديد بياناتك. يمكنك التخطي وتغييرها لاحقًا من الإعدادات.',
   'onboarding.age.under18': 'أقل من 18 — تبقى الأهداف الشخصية للطاقة معطّلة.',
+  'intro.mute': 'كتم صوت البداية',
+  'intro.unmute': 'تشغيل صوت البداية',
 } as const
 
 export type ArExtraKey = keyof typeof arExtra

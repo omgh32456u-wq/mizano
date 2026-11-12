@@ -12,6 +12,8 @@ export const enExtra = {
   'auth.guest': 'Continue without an account',
   'onboarding.profile.hint2': 'Turn the wheels to set your details. You can skip this and change it later in Settings.',
   'onboarding.age.under18': 'Under 18 — personal energy targets stay off for now.',
+  'intro.mute': 'Mute opening sound',
+  'intro.unmute': 'Play opening sound',
 } as const
 
 export type ExtraKey = keyof typeof enExtra

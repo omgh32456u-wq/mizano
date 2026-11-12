@@ -1,14 +1,9 @@
 'use client'
 
-/**
- * Subtle original opening tone, synthesized with Web Audio (no asset, no
- * dependency). A soft two-note rise with a gentle fade — clearly optional
- * and never played for reduced-motion users. Autoplay policy is respected:
- * the sound only starts after a user gesture (the very first tap in the
- * app), which the caller ensures by hooking a one-time pointerdown.
- */
+/** Subtle original opening tone, synthesized with Web Audio (no asset/dependency). */
 
 let audioCtx: AudioContext | null = null
+let activeMaster: GainNode | null = null
 
 function ensureCtx(): AudioContext | null {
   if (typeof window === 'undefined') return null
@@ -21,12 +16,13 @@ function ensureCtx(): AudioContext | null {
   return audioCtx
 }
 
-/** Gentle two-note opening chime (~1s, peak gain 0.12). No-op if audio is unavailable. */
+/** Gentle two-note opening chime (~1s, peak gain 0.12). */
 export function playOpeningTone() {
   const ctx = ensureCtx()
   if (!ctx) return
   const now = ctx.currentTime
   const master = ctx.createGain()
+  activeMaster = master
   master.gain.setValueAtTime(0, now)
   master.gain.linearRampToValueAtTime(0.12, now + 0.08)
   master.gain.linearRampToValueAtTime(0, now + 1.1)
@@ -34,27 +30,35 @@ export function playOpeningTone() {
 
   const note = (freq: number, start: number, dur: number) => {
     const osc = ctx.createOscillator()
-    const g = ctx.createGain()
+    const gain = ctx.createGain()
     osc.type = 'sine'
     osc.frequency.setValueAtTime(freq, now + start)
-    g.gain.setValueAtTime(0, now + start)
-    g.gain.linearRampToValueAtTime(1, now + start + 0.05)
-    g.gain.exponentialRampToValueAtTime(0.001, now + start + dur)
-    osc.connect(g)
-    g.connect(master)
+    gain.gain.setValueAtTime(0, now + start)
+    gain.gain.linearRampToValueAtTime(1, now + start + 0.05)
+    gain.gain.exponentialRampToValueAtTime(0.001, now + start + dur)
+    osc.connect(gain)
+    gain.connect(master)
     osc.start(now + start)
     osc.stop(now + start + dur + 0.05)
   }
-  // Rising major third (B4 -> E5): calm, botanical, unobtrusive.
   note(494, 0, 0.7)
   note(659, 0.22, 0.9)
 }
 
-/** True once the user has tapped/pressed anywhere in the document. */
-export function armOnceOnGesture(cb: () => void): () => void {
-  const handler = () => {
+/** Fade out the currently playing opening tone, if any. */
+export function stopOpeningTone() {
+  if (!activeMaster || !audioCtx) return
+  const now = audioCtx.currentTime
+  activeMaster.gain.cancelScheduledValues(now)
+  activeMaster.gain.setTargetAtTime(0, now, 0.015)
+  activeMaster = null
+}
+
+/** Arm a one-time pointer gesture; pass its event so callers can exclude controls. */
+export function armOnceOnGesture(cb: (event: PointerEvent) => void): () => void {
+  const handler = (event: PointerEvent) => {
     window.removeEventListener('pointerdown', handler)
-    cb()
+    cb(event)
   }
   window.addEventListener('pointerdown', handler, { passive: true })
   return () => window.removeEventListener('pointerdown', handler)
