@@ -6,6 +6,7 @@ import { useStore } from '@/components/providers/app-store'
 import { Wheel, type WheelItem } from './onboarding-wheel'
 import { SexSelect, ActivitySelect } from './onboarding-pickers'
 import type { StepApi } from './onboarding-steps'
+import type { MessageKey } from '@/lib/i18n'
 
 /**
  * Consolidated profile step: age/height/weight wheels, sex, activity.
@@ -92,12 +93,12 @@ export function ProfileWheelsStep({ api }: { api: StepApi }) {
 
       <div className="flex flex-col gap-2">
         <span className="text-sm font-medium">{t('settings.sex')}</span>
-        <SexSelect value={profile.sex} onChange={(s) => onSetProfile({ sex: s })} t={t} />
+        <SexSelect value={profile.sex} onChange={(s) => onSetProfile({ sex: s })} t={(k) => t(k as MessageKey)} />
       </div>
 
       <div className="flex flex-col gap-2">
         <span className="text-sm font-medium">{t('settings.activity')}</span>
-        <ActivitySelect value={profile.activity} onChange={(a) => onSetProfile({ activity: a })} t={t} />
+        <ActivitySelect value={profile.activity} onChange={(a) => onSetProfile({ activity: a })} t={(k) => t(k as MessageKey)} />
       </div>
 
       <div className="mt-auto flex gap-2 pt-2">
