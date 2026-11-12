@@ -4,9 +4,10 @@ import { useCallback, useState } from 'react'
 import { useStore } from '@/components/providers/app-store'
 import { useAction } from '@/components/providers/use-action'
 import { OnboardingLayout } from './onboarding-layout'
+import { StepTransition } from './onboarding-transition'
+import { AuthStep } from './onboarding-auth'
 import { StepPanel, type StepApi } from './onboarding-steps'
 import { ProfileStep } from './onboarding-step-profile'
-import { StepTransition } from './onboarding-transition'
 import { growthState } from './onboarding-growths'
 import type { Locale, Profile, ThemePref } from '@/lib/types'
 
@@ -67,7 +68,8 @@ export function Onboarding() {
   return (
     <OnboardingLayout step={step} total={total} growth={growth} introDone={introDone} onIntroDone={() => setIntroDone(true)}>
       <StepTransition stepKey={step} dir={dirMotion}>
-        {step === 3 && adult ? <ProfileStep api={api} /> : <StepPanel api={api} />}
+        {step === 0 && <AuthStep onSkip={() => go(1)} />}
+        {step > 0 && (step === 3 && adult ? <ProfileStep api={api} /> : <StepPanel api={api} />)}
       </StepTransition>
     </OnboardingLayout>
   )
