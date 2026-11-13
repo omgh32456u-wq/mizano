@@ -6,6 +6,7 @@ import { Field, NativeSelect, Notice, NumberInput, Segmented } from '@/component
 import { useStore } from '@/components/providers/app-store'
 import { CM_PER_IN, kgToLb, lbToKg, parseLocaleNumber } from '@/lib/nutrition'
 import type { ActivityLevel, AgeGroup, Profile, Sex } from '@/lib/types'
+import { cn } from '@/lib/utils'
 
 const ACTIVITIES: ActivityLevel[] = ['sedentary', 'light', 'moderate', 'active', 'very_active']
 
@@ -16,11 +17,13 @@ export function ProfileForm({
   onSubmit,
   submitSlot,
   showAgeGroup = true,
+  className,
 }: {
   initial: Profile
   onSubmit: (p: Profile) => void
   submitSlot: (submit: () => void) => ReactNode
   showAgeGroup?: boolean
+  className?: string
 }) {
   const { i18n } = useStore()
   const { t } = i18n
@@ -60,7 +63,7 @@ export function ProfileForm({
 
   return (
     <form
-      className="flex flex-col gap-4"
+      className={cn('flex flex-col gap-4', className)}
       onSubmit={(e) => {
         e.preventDefault()
         submit()

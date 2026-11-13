@@ -1,12 +1,21 @@
 import type { Locale } from '../types'
 import { parseDateKey } from '../dates'
 import { ar } from './ar'
-import { en, type MessageKey } from './en'
+import { en, type MessageKey as BaseKey } from './en'
+import { arExtra } from './ar-extra'
+import { enExtra, type ExtraKey } from './en-extra'
 
-export type { MessageKey }
+export type MessageKey = BaseKey | ExtraKey
 export type Vars = Record<string, string | number>
 
-const dictionaries: Record<Locale, Record<MessageKey, string>> = { en, ar }
+// Widen the const dictionaries so MessageKey (which includes ExtraKey) can index them.
+const enAll: Record<MessageKey, string> = { ...en, ...enExtra }
+const arAll: Record<MessageKey, string> = { ...ar, ...arExtra }
+
+const dictionaries: Record<Locale, Record<MessageKey, string>> = {
+  en: enAll,
+  ar: arAll,
+}
 const intlLocale: Record<Locale, string> = { en: 'en-US', ar: 'ar-EG' }
 
 export const dirFor = (l: Locale): 'ltr' | 'rtl' => (l === 'ar' ? 'rtl' : 'ltr')
@@ -30,7 +39,7 @@ export function createTranslator(locale: Locale) {
   }
 
   const t = (key: MessageKey, vars?: Vars) => {
-    const template = dict[key] ?? en[key] ?? key
+    const template = dict[key] ?? enAll[key] ?? key
     if (!vars) return template
     return template.replace(/\{(\w+)\}/g, (_, name: string) => {
       const v = vars[name]
